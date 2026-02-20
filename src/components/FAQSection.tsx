@@ -9,36 +9,24 @@ const faqs = [
   { q: "How soon can surgery be scheduled?", a: "Most procedures can be scheduled within 3-7 days of consultation, depending on the hospital and your medical evaluation." },
 ];
 
-const half = Math.ceil(faqs.length / 2);
-const leftFaqs = faqs.slice(0, half);
-const rightFaqs = faqs.slice(half);
-
-const FAQColumn = ({ items, offset = 0 }: { items: typeof faqs; offset?: number }) => (
-  <Accordion type="single" collapsible className="space-y-3">
-    {items.map((f, i) => (
-      <AccordionItem key={i + offset} value={`faq-${i + offset}`} className="bg-card rounded-2xl border border-border px-6 overflow-hidden">
-        <AccordionTrigger className="text-left font-semibold text-sm hover:no-underline">
-          {f.q}
-        </AccordionTrigger>
-        <AccordionContent className="text-sm text-muted-foreground">
-          {f.a}
-        </AccordionContent>
-      </AccordionItem>
-    ))}
-  </Accordion>
-);
-
 const FAQSection = () => (
-  <section className="py-16 md:py-24">
-    <div className="container mx-auto px-4 max-w-5xl">
-      <p className="text-center text-sm font-medium text-primary tracking-wider uppercase mb-2">FAQs</p>
-      <h2 className="font-serif text-3xl md:text-4xl font-bold text-center mb-14">
-        Answers to Your Most Frequently Asked Questions
+  <section className="py-16 md:py-20">
+    <div className="container mx-auto px-4 max-w-3xl">
+      <h2 className="font-serif text-3xl md:text-4xl font-bold text-center mb-12">
+        Frequently Asked Questions
       </h2>
-      <div className="grid md:grid-cols-2 gap-6">
-        <FAQColumn items={leftFaqs} />
-        <FAQColumn items={rightFaqs} offset={half} />
-      </div>
+      <Accordion type="single" collapsible className="space-y-3">
+        {faqs.map((f, i) => (
+          <AccordionItem key={i} value={`faq-${i}`} className="bg-card rounded-2xl border border-border px-6 overflow-hidden">
+            <AccordionTrigger className="text-left font-semibold text-sm hover:no-underline">
+              {f.q}
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground">
+              {f.a}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
     </div>
   </section>
 );
