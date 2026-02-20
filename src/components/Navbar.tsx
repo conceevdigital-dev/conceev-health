@@ -44,15 +44,20 @@ const Navbar = () => {
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden bg-card border-b border-border px-4 pb-4 space-y-3">
+        <div className="md:hidden bg-card border-b border-border px-4 pb-4 space-y-1 animate-fade-in">
           {navLinks.map((l) => (
-            <a key={l.label} href={l.href} onClick={() => setMobileOpen(false)} className="block text-sm font-medium text-foreground/80 hover:text-primary py-2">
+            <a key={l.label} href={l.href} onClick={() => setMobileOpen(false)} className="block text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 rounded-xl py-3 px-3 transition-colors">
               {l.label}
             </a>
           ))}
-          <Button size="sm" className="w-full rounded-full gap-2">
-            <Phone className="h-4 w-4" /> Call Now
-          </Button>
+          <div className="pt-2 space-y-2">
+            <Button size="sm" variant="outline" className="w-full rounded-full gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+              <Phone className="h-4 w-4" /> Call Now
+            </Button>
+            <Button size="sm" className="w-full rounded-full">
+              Book Consultation
+            </Button>
+          </div>
         </div>
       )}
     </nav>

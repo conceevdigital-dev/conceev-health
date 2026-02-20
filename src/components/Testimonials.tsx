@@ -29,12 +29,12 @@ const Testimonials = () => {
 
         <div className="grid md:grid-cols-2 gap-8 items-center">
           {/* Quote cards */}
-          <div className="space-y-4">
+          <div className="space-y-4 order-2 md:order-1">
             {testimonials.slice(0, 3).map((t, i) => (
               <button
                 key={i}
                 onClick={() => setIdx(i)}
-                className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 ${
+                className={`w-full text-left p-4 sm:p-5 rounded-2xl border transition-all duration-300 ${
                   idx === i ? "bg-card border-primary shadow-md" : "bg-card/50 border-border hover:border-primary/30"
                 }`}
               >
@@ -51,8 +51,8 @@ const Testimonials = () => {
           </div>
 
           {/* Active testimonial with image */}
-          <div className="flex flex-col items-center text-center">
-            <div className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg mb-6">
+          <div className="flex flex-col items-center text-center order-1 md:order-2">
+            <div className="w-36 h-36 sm:w-48 sm:h-48 rounded-2xl overflow-hidden shadow-lg mb-6">
               <img src={testimonials[idx].image} alt={testimonials[idx].name} className="w-full h-full object-cover" />
             </div>
             <Quote className="h-6 w-6 text-primary/30 mb-3 rotate-180" />

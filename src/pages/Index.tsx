@@ -17,7 +17,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import MobileBottomBar from "@/components/MobileBottomBar";
 
 const Index = () => (
-  <div className="min-h-screen">
+  <div className="min-h-screen pb-14 md:pb-0">
     <Navbar />
     <main>
       <HeroSection />

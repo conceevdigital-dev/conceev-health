@@ -39,12 +39,12 @@ const Packages = () => {
         <div className="container mx-auto px-4">
           {/* Specialty Tabs + City Filter */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
               {specialties.map((label, i) => (
                 <button
                   key={label}
                   onClick={() => setActiveTab(i)}
-                  className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                  className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
                     activeTab === i
                       ? "bg-primary text-primary-foreground shadow-md"
                       : "bg-card border border-border text-muted-foreground hover:text-foreground"
