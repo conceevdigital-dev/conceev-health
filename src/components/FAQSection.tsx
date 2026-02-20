@@ -68,21 +68,28 @@ const FAQSection = () => {
   };
 
   return (
-    <section id="faqs" className="py-16 md:py-20 bg-background">
+    <section id="faqs" className="py-16 md:py-24 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8 items-start">
-          {/* FAQ Column */}
-          <div className="md:col-span-2">
-            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-8 text-foreground">
+        <div className="grid lg:grid-cols-5 gap-10 items-start">
+          {/* FAQ Column - takes 3 of 5 cols */}
+          <div className="lg:col-span-3">
+            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-2 text-foreground">
               Frequently Asked Questions
             </h2>
+            <p className="text-muted-foreground mb-8 text-sm">
+              Everything you need to know about our services and care process.
+            </p>
             <Accordion type="single" collapsible className="space-y-3">
               {faqs.map((f, i) => (
-                <AccordionItem key={i} value={`faq-${i}`} className="bg-card rounded-2xl border border-border px-6 overflow-hidden">
-                  <AccordionTrigger className="text-left font-semibold text-sm hover:no-underline">
+                <AccordionItem
+                  key={i}
+                  value={`faq-${i}`}
+                  className="bg-card rounded-2xl border border-border px-6 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                >
+                  <AccordionTrigger className="text-left font-semibold text-sm md:text-base hover:no-underline py-5">
                     {f.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground">
+                  <AccordionContent className="text-sm text-muted-foreground pb-5">
                     {f.a}
                   </AccordionContent>
                 </AccordionItem>
@@ -90,14 +97,19 @@ const FAQSection = () => {
             </Accordion>
           </div>
 
-          {/* Contact Form Sidebar */}
-          <div className="md:mt-16">
-            <div className="bg-navy rounded-2xl p-6 text-primary-foreground sticky top-24">
-              <MessageCircle className="h-8 w-8 mb-3 text-primary-foreground/70" />
-              <h3 className="font-serif text-lg font-bold mb-1">Have Questions? Ask our Expert</h3>
-              <p className="text-xs text-primary-foreground/70 mb-4">
-                Get personalized advice from our care coordinators.
-              </p>
+          {/* Contact Form Column - takes 2 of 5 cols */}
+          <div className="lg:col-span-2 lg:mt-12">
+            <div className="bg-navy rounded-3xl p-7 text-primary-foreground shadow-xl sticky top-24">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 rounded-full bg-primary-foreground/10 flex items-center justify-center">
+                  <MessageCircle className="h-6 w-6 text-primary-foreground/80" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg font-bold leading-tight">Have Questions? Ask our Expert</h3>
+                  <p className="text-xs text-primary-foreground/60">Get personalized advice from our care coordinators.</p>
+                </div>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div className="grid grid-cols-2 gap-2">
                   <Input
@@ -105,19 +117,19 @@ const FAQSection = () => {
                     value={form.firstName}
                     onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                     maxLength={50}
-                    className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 text-sm h-9"
+                    className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 text-sm h-10 rounded-xl"
                   />
                   <Input
                     placeholder="Last Name"
                     value={form.lastName}
                     onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                     maxLength={50}
-                    className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 text-sm h-9"
+                    className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 text-sm h-10 rounded-xl"
                   />
                 </div>
                 <div className="flex gap-1">
                   <Select value={String(countryIdx)} onValueChange={(v) => { setCountryIdx(Number(v)); setForm({ ...form, phone: "" }); }}>
-                    <SelectTrigger className="w-[80px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground text-sm h-9 px-2">
+                    <SelectTrigger className="w-[85px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground text-sm h-10 px-2 rounded-xl">
                       <SelectValue>{selectedCountry.flag} {selectedCountry.code}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -135,11 +147,11 @@ const FAQSection = () => {
                       setForm({ ...form, phone: val });
                     }}
                     maxLength={selectedCountry.maxLen}
-                    className="flex-1 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 text-sm h-9"
+                    className="flex-1 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 text-sm h-10 rounded-xl"
                   />
                 </div>
                 <Select value={form.surgery} onValueChange={(v) => setForm({ ...form, surgery: v })}>
-                  <SelectTrigger className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground text-sm h-9">
+                  <SelectTrigger className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground text-sm h-10 rounded-xl">
                     <SelectValue placeholder="Surgery Looking For *" />
                   </SelectTrigger>
                   <SelectContent>
@@ -147,7 +159,7 @@ const FAQSection = () => {
                   </SelectContent>
                 </Select>
                 <Select value={form.location} onValueChange={(v) => setForm({ ...form, location: v })}>
-                  <SelectTrigger className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground text-sm h-9">
+                  <SelectTrigger className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground text-sm h-10 rounded-xl">
                     <SelectValue placeholder="Preferred Location *" />
                   </SelectTrigger>
                   <SelectContent>
@@ -160,7 +172,7 @@ const FAQSection = () => {
                   value={form.query}
                   onChange={(e) => setForm({ ...form, query: e.target.value })}
                   maxLength={500}
-                  className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 text-sm min-h-[70px]"
+                  className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 text-sm min-h-[80px] rounded-xl"
                 />
                 <div className="flex items-start gap-2">
                   <Checkbox
@@ -172,7 +184,7 @@ const FAQSection = () => {
                     I agree to the Terms & Conditions and Privacy Policy
                   </label>
                 </div>
-                <Button type="submit" className="w-full rounded-full bg-primary hover:bg-primary/90 text-sm" disabled={loading}>
+                <Button type="submit" className="w-full rounded-full bg-primary hover:bg-primary/90 text-sm h-11 font-semibold" disabled={loading}>
                   {loading ? "Submitting..." : "Book Free Consultation"}
                 </Button>
               </form>
