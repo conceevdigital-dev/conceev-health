@@ -15,7 +15,7 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b border-border">
+    <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="font-serif text-2xl font-bold text-primary">
           Conceev<span className="text-accent">Health</span>
@@ -28,8 +28,11 @@ const Navbar = () => {
               {l.label}
             </a>
           ))}
-          <Button size="sm" className="rounded-2xl gap-2">
-            <Phone className="h-4 w-4" /> Call Now
+          <Button size="sm" variant="outline" className="rounded-full gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+            <Phone className="h-4 w-4" /> +91 98765 43210
+          </Button>
+          <Button size="sm" className="rounded-full">
+            Book Consultation
           </Button>
         </div>
 
@@ -39,7 +42,6 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden bg-card border-b border-border px-4 pb-4 space-y-3">
           {navLinks.map((l) => (
@@ -47,7 +49,7 @@ const Navbar = () => {
               {l.label}
             </a>
           ))}
-          <Button size="sm" className="w-full rounded-2xl gap-2">
+          <Button size="sm" className="w-full rounded-full gap-2">
             <Phone className="h-4 w-4" /> Call Now
           </Button>
         </div>
