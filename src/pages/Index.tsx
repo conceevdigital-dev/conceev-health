@@ -1,16 +1,13 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import TrustMetrics from "@/components/TrustMetrics";
 import ProblemSection from "@/components/ProblemSection";
 import SpecialtiesGrid from "@/components/SpecialtiesGrid";
-import HowItWorks from "@/components/HowItWorks";
-import FeaturedPackages from "@/components/FeaturedPackages";
 import WhyChooseUs from "@/components/WhyChooseUs";
-import PartnersAndDoctors from "@/components/PartnersAndDoctors";
-import PackageInclusions from "@/components/PackageInclusions";
+import TrustMetrics from "@/components/TrustMetrics";
+import FeaturedPackages from "@/components/FeaturedPackages";
 import Testimonials from "@/components/Testimonials";
-import CityCoverage from "@/components/CityCoverage";
 import FAQSection from "@/components/FAQSection";
+import BlogInsights from "@/components/BlogInsights";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -21,17 +18,14 @@ const Index = () => (
     <Navbar />
     <main>
       <HeroSection />
-      <TrustMetrics />
       <ProblemSection />
       <SpecialtiesGrid />
-      <HowItWorks />
-      <FeaturedPackages />
       <WhyChooseUs />
-      <PartnersAndDoctors />
-      <PackageInclusions />
+      <TrustMetrics />
+      <FeaturedPackages />
       <Testimonials />
-      <CityCoverage />
       <FAQSection />
+      <BlogInsights />
       <FinalCTA />
     </main>
     <Footer />
