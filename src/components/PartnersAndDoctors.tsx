@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Building2, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Building2, ArrowRight, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import LeadFormModal from "./LeadFormModal";
 import doctorPriya from "@/assets/doctor-priya.jpg";
 import doctorAnita from "@/assets/doctor-anita.jpg";
 import doctorMeera from "@/assets/doctor-meera.jpg";
@@ -15,20 +16,35 @@ const hospitals = [
 ];
 
 const allDoctors = [
-  { name: "Dr. Priya Sharma", designation: "Senior Fertility Specialist", experience: "15+ years", image: doctorPriya },
-  { name: "Dr. Anita Reddy", designation: "Consultant Gynecologist", experience: "12+ years", image: doctorAnita },
-  { name: "Dr. Meera Krishnan", designation: "Obstetrician & Surgeon", experience: "18+ years", image: doctorMeera },
+  {
+    name: "Dr. Priya Sharma",
+    designation: "Senior Fertility Specialist",
+    experience: "15+ years",
+    surgeries: ["IVF", "IUI", "Egg Freezing"],
+    image: doctorPriya,
+  },
+  {
+    name: "Dr. Anita Reddy",
+    designation: "Consultant Gynecologist",
+    experience: "12+ years",
+    surgeries: ["Hysterectomy", "Fibroid Surgery", "Laparoscopy"],
+    image: doctorAnita,
+  },
+  {
+    name: "Dr. Meera Krishnan",
+    designation: "Obstetrician & Surgeon",
+    experience: "18+ years",
+    surgeries: ["C-Section", "Normal Delivery", "High-Risk Pregnancy"],
+    image: doctorMeera,
+  },
 ];
 
 const PartnersAndDoctors = () => {
   const [activeHospital, setActiveHospital] = useState("All");
-  const [scrollIndex, setScrollIndex] = useState(0);
+  const [formOpen, setFormOpen] = useState(false);
 
   const selectedHospital = hospitals.find((h) => h.name === activeHospital)!;
   const filteredDoctors = allDoctors.filter((d) => selectedHospital.doctors.includes(d.name));
-
-  const canScrollLeft = scrollIndex > 0;
-  const canScrollRight = scrollIndex < filteredDoctors.length - 1;
 
   return (
     <section id="surgeons" className="py-16 md:py-20 bg-background">
@@ -45,11 +61,11 @@ const PartnersAndDoctors = () => {
         </div>
 
         {/* Hospital chips */}
-        <div className="flex gap-3 mb-8 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+        <div className="flex gap-3 mb-10 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
           {hospitals.map((h) => (
             <button
               key={h.name}
-              onClick={() => { setActiveHospital(h.name); setScrollIndex(0); }}
+              onClick={() => setActiveHospital(h.name)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 activeHospital === h.name
                   ? "bg-primary text-primary-foreground border-primary shadow-md"
@@ -62,64 +78,68 @@ const PartnersAndDoctors = () => {
           ))}
         </div>
 
-        {/* Doctor cards carousel */}
-        <div className="relative max-w-4xl overflow-x-auto">
-          {/* Navigation arrows */}
-          {filteredDoctors.length > 3 && (
-            <>
-              <button
-                onClick={() => setScrollIndex(Math.max(0, scrollIndex - 1))}
-                disabled={!canScrollLeft}
-                className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-card border border-border shadow flex items-center justify-center disabled:opacity-30 hover:bg-accent transition-colors"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setScrollIndex(Math.min(filteredDoctors.length - 1, scrollIndex + 1))}
-                disabled={!canScrollRight}
-                className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-card border border-border shadow flex items-center justify-center disabled:opacity-30 hover:bg-accent transition-colors"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </>
-          )}
-
-          <div className="overflow-hidden">
+        {/* Doctor cards */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredDoctors.map((d) => (
             <div
-              className="flex gap-6 transition-transform duration-300"
-              style={{ transform: `translateX(-${scrollIndex * 280}px)` }}
+              key={d.name}
+              className="bg-card rounded-2xl border border-border p-6 hover:shadow-lg hover:border-primary/30 transition-all duration-300 flex flex-col"
             >
-              {filteredDoctors.map((d) => (
-                <div
-                  key={d.name}
-                  className="min-w-[250px] flex-shrink-0 bg-card rounded-2xl border border-border p-5 hover:shadow-md hover:border-primary/30 transition-all flex items-center gap-4"
-                >
-                  <div className="w-16 h-16 rounded-full overflow-hidden shrink-0 border-2 border-primary/20">
-                    <img src={d.image} alt={d.name} className="w-full h-full object-cover" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm text-foreground">{d.name}</h3>
-                    <p className="text-xs text-primary mt-0.5">{d.designation}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{d.experience} experience</p>
-                  </div>
+              {/* Top: Avatar + Info */}
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 border-2 border-primary/20 shadow-md">
+                  <img src={d.image} alt={d.name} className="w-full h-full object-cover" />
                 </div>
-              ))}
-            </div>
-          </div>
+                <div>
+                  <h3 className="font-serif font-bold text-foreground text-lg leading-tight">{d.name}</h3>
+                  <p className="text-sm text-primary font-medium mt-0.5">{d.designation}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{d.experience} experience</p>
+                </div>
+              </div>
 
-          {filteredDoctors.length === 0 && (
-            <p className="text-muted-foreground text-sm py-8 text-center">No doctors found for this hospital.</p>
-          )}
+              {/* Surgeries */}
+              <div className="mb-5 flex-1">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Top Surgeries</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {d.surgeries.map((s) => (
+                    <span key={s} className="text-xs px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground font-medium">
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="flex-1 rounded-full gap-1.5"
+                  onClick={() => setFormOpen(true)}
+                >
+                  <Calendar className="h-3.5 w-3.5" /> Book Appointment
+                </Button>
+                <Button size="sm" variant="outline" className="rounded-full gap-1.5">
+                  <User className="h-3.5 w-3.5" /> View Profile
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
 
+        {filteredDoctors.length === 0 && (
+          <p className="text-muted-foreground text-sm py-8 text-center">No doctors found for this hospital.</p>
+        )}
+
         {/* View All button */}
-        <div className="mt-8">
-          <Button variant="outline" className="group">
+        <div className="mt-10">
+          <Button variant="outline" className="group rounded-full">
             View All Doctor Profiles
             <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>
+
+      <LeadFormModal open={formOpen} onOpenChange={setFormOpen} />
     </section>
   );
 };
