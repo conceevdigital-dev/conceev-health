@@ -1,10 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Building2, ArrowRight, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LeadFormModal from "./LeadFormModal";
-import doctorPriya from "@/assets/doctor-priya.jpg";
-import doctorAnita from "@/assets/doctor-anita.jpg";
-import doctorMeera from "@/assets/doctor-meera.jpg";
+import { doctors } from "@/data/doctors";
 
 const hospitals = [
   { name: "All", doctors: ["Dr. Priya Sharma", "Dr. Anita Reddy", "Dr. Meera Krishnan"] },
@@ -15,29 +14,7 @@ const hospitals = [
   { name: "Rainbow Hospital", doctors: ["Dr. Anita Reddy", "Dr. Meera Krishnan"] },
 ];
 
-const allDoctors = [
-  {
-    name: "Dr. Priya Sharma",
-    designation: "Senior Fertility Specialist",
-    experience: "15+ years",
-    surgeries: ["IVF", "IUI", "Egg Freezing"],
-    image: doctorPriya,
-  },
-  {
-    name: "Dr. Anita Reddy",
-    designation: "Consultant Gynecologist",
-    experience: "12+ years",
-    surgeries: ["Hysterectomy", "Fibroid Surgery", "Laparoscopy"],
-    image: doctorAnita,
-  },
-  {
-    name: "Dr. Meera Krishnan",
-    designation: "Obstetrician & Surgeon",
-    experience: "18+ years",
-    surgeries: ["C-Section", "Normal Delivery", "High-Risk Pregnancy"],
-    image: doctorMeera,
-  },
-];
+const allDoctors = doctors;
 
 const PartnersAndDoctors = () => {
   const [activeHospital, setActiveHospital] = useState("All");
@@ -118,9 +95,11 @@ const PartnersAndDoctors = () => {
                 >
                   <Calendar className="h-3.5 w-3.5" /> Book Appointment
                 </Button>
-                <Button size="sm" variant="outline" className="rounded-full gap-1.5">
-                  <User className="h-3.5 w-3.5" /> View Profile
-                </Button>
+                <Link to={`/doctors/${d.slug}`}>
+                  <Button size="sm" variant="outline" className="rounded-full gap-1.5">
+                    <User className="h-3.5 w-3.5" /> View Profile
+                  </Button>
+                </Link>
               </div>
             </div>
           ))}
