@@ -45,12 +45,12 @@ const PartnersAndDoctors = () => {
         </div>
 
         {/* Hospital chips */}
-        <div className="flex flex-wrap gap-3 mb-8">
+        <div className="flex gap-3 mb-8 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
           {hospitals.map((h) => (
             <button
               key={h.name}
               onClick={() => { setActiveHospital(h.name); setScrollIndex(0); }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 activeHospital === h.name
                   ? "bg-primary text-primary-foreground border-primary shadow-md"
                   : "bg-card border-border text-muted-foreground hover:border-primary/40 hover:shadow-sm"
@@ -63,7 +63,7 @@ const PartnersAndDoctors = () => {
         </div>
 
         {/* Doctor cards carousel */}
-        <div className="relative max-w-4xl">
+        <div className="relative max-w-4xl overflow-x-auto">
           {/* Navigation arrows */}
           {filteredDoctors.length > 3 && (
             <>

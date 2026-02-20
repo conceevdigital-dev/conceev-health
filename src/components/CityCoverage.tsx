@@ -98,19 +98,19 @@ const CityCoverage = () => {
         </p>
 
         {/* City tabs */}
-        <div className="flex gap-0 max-w-5xl mx-auto">
+        <div className="flex flex-col sm:flex-row gap-0 max-w-5xl mx-auto">
           {cities.map((c) => (
             <button
               key={c.city}
               onClick={() => handleCityClick(c.city)}
-              className={`flex-1 flex items-center justify-between px-6 py-4 border transition-all cursor-pointer ${
+              className={`flex-1 flex items-center justify-between px-4 sm:px-6 py-4 border transition-all cursor-pointer ${
                 activeCity === c.city
                   ? "bg-card border-border border-b-card rounded-t-2xl shadow-sm z-10"
                   : "bg-secondary/80 border-transparent hover:bg-secondary rounded-t-2xl"
               }`}
             >
               <div className="flex items-center gap-3">
-                <h3 className="font-serif text-lg font-bold flex items-center gap-2 text-foreground">
+                <h3 className="font-serif text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
                   <MapPin className="h-5 w-5 text-primary" /> {c.city}
                 </h3>
                 <span className="text-xs font-medium bg-primary/10 text-primary px-3 py-1 rounded-full">
@@ -140,12 +140,12 @@ const CityCoverage = () => {
                 className="bg-card rounded-b-2xl border border-t-0 border-border p-6 max-w-5xl mx-auto shadow-sm"
               >
                 {/* Area chips */}
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-2 mb-4 overflow-x-auto pb-1">
                   {c.areas.map((a) => (
                     <button
                       key={a}
                       onClick={() => handleAreaClick(c.city, a)}
-                      className={`text-sm px-3.5 py-1.5 rounded-full transition-all cursor-pointer font-medium ${
+                      className={`text-sm px-3.5 py-1.5 rounded-full transition-all cursor-pointer font-medium whitespace-nowrap shrink-0 ${
                         activeArea === a
                           ? "bg-primary text-primary-foreground shadow-sm"
                           : "bg-secondary text-secondary-foreground hover:bg-primary/10"
@@ -190,15 +190,15 @@ const CityCoverage = () => {
                       )}
                     </div>
 
-                    <div className="overflow-hidden">
+                    <div className="overflow-x-auto pb-2 -mx-1 px-1">
                       <div
-                        className="flex gap-4 transition-transform duration-300"
+                        className="flex gap-4 transition-transform duration-300 md:transition-transform"
                         style={{ transform: `translateX(-${scrollIndex * 292}px)` }}
                       >
                         {filteredHospitals.map((h, i) => (
                           <div
                             key={`${h.name}-${i}`}
-                            className="min-w-[270px] max-w-[270px] flex-shrink-0 bg-background rounded-xl border border-border p-5 hover:shadow-md hover:border-primary/30 transition-all flex flex-col gap-3"
+                            className="min-w-[250px] sm:min-w-[270px] max-w-[270px] flex-shrink-0 bg-background rounded-xl border border-border p-5 hover:shadow-md hover:border-primary/30 transition-all flex flex-col gap-3"
                           >
                             <div className="flex items-start gap-3">
                               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
