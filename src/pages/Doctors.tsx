@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Search, Building2, MapPin, Stethoscope, Calendar, User, Filter, X } from "lucide-react";
+import { Search, Calendar, User, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LeadFormModal from "@/components/LeadFormModal";
@@ -61,86 +62,63 @@ const Doctors = () => {
       </section>
 
       <div className="container mx-auto px-4 py-10">
-        {/* Search + Filters */}
-        <div className="space-y-4 mb-8">
-          <div className="relative max-w-xl">
+        {/* Filters row */}
+        <div className="flex flex-col md:flex-row md:items-center gap-3 mb-8">
+          {/* Dropdowns on left */}
+          <div className="flex flex-wrap items-center gap-3 flex-1">
+            <Select value={cityFilter ?? ""} onValueChange={(v) => setCityFilter(v === "all" ? null : v)}>
+              <SelectTrigger className="w-[160px] rounded-full">
+                <SelectValue placeholder="City" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Cities</SelectItem>
+                {allCities.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={hospitalFilter ?? ""} onValueChange={(v) => setHospitalFilter(v === "all" ? null : v)}>
+              <SelectTrigger className="w-[200px] rounded-full">
+                <SelectValue placeholder="Hospital" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Hospitals</SelectItem>
+                {allHospitals.map((h) => (
+                  <SelectItem key={h} value={h}>{h}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={specFilter ?? ""} onValueChange={(v) => setSpecFilter(v === "all" ? null : v)}>
+              <SelectTrigger className="w-[220px] rounded-full">
+                <SelectValue placeholder="Specialization" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Specializations</SelectItem>
+                {allSpecializations.map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {activeFilters > 0 && (
+              <button onClick={clearAll} className="text-xs text-primary font-medium flex items-center gap-1 hover:underline cursor-pointer">
+                <X className="h-3 w-3" /> Clear
+              </button>
+            )}
+          </div>
+
+          {/* Search on right */}
+          <div className="relative w-full md:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by name, speciality, or surgery..."
+              placeholder="Search doctor or surgery..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 rounded-full"
             />
           </div>
-
-          {/* Filter chips */}
-          <div className="space-y-3">
-            {/* City */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5" /> City
-              </span>
-              {allCities.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setCityFilter(cityFilter === c ? null : c)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                    cityFilter === c
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card border-border text-muted-foreground hover:border-primary/40"
-                  }`}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-
-            {/* Hospital */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
-                <Building2 className="h-3.5 w-3.5" /> Hospital
-              </span>
-              {allHospitals.map((h) => (
-                <button
-                  key={h}
-                  onClick={() => setHospitalFilter(hospitalFilter === h ? null : h)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                    hospitalFilter === h
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card border-border text-muted-foreground hover:border-primary/40"
-                  }`}
-                >
-                  {h}
-                </button>
-              ))}
-            </div>
-
-            {/* Specialization */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
-                <Stethoscope className="h-3.5 w-3.5" /> Specialization
-              </span>
-              {allSpecializations.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSpecFilter(specFilter === s ? null : s)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                    specFilter === s
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card border-border text-muted-foreground hover:border-primary/40"
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {activeFilters > 0 && (
-            <button onClick={clearAll} className="text-xs text-primary font-medium flex items-center gap-1 hover:underline cursor-pointer">
-              <X className="h-3 w-3" /> Clear all filters
-            </button>
-          )}
         </div>
 
         {/* Results count */}
