@@ -9,7 +9,7 @@ const features = [
 const FutureBanner = () => (
   <section className="bg-primary py-12 md:py-16">
     <div className="container mx-auto px-4">
-      <h2 className="font-serif text-2xl md:text-3xl font-bold text-center text-primary-foreground mb-10">
+      <h2 className="font-serif text-3xl md:text-4xl font-bold text-center text-primary-foreground mb-10">
         Welcome to the Future of Surgical Care
       </h2>
       <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
@@ -18,7 +18,7 @@ const FutureBanner = () => (
             <div className="w-14 h-14 rounded-full bg-primary-foreground/10 mx-auto flex items-center justify-center mb-3">
               <Icon className="h-7 w-7 text-primary-foreground" />
             </div>
-            <h3 className="font-semibold text-sm text-primary-foreground mb-1">{title}</h3>
+            <h3 className="font-serif font-bold text-sm text-primary-foreground mb-1">{title}</h3>
             <p className="text-xs text-primary-foreground/70">{desc}</p>
           </div>
         ))}

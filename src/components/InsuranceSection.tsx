@@ -11,7 +11,7 @@ const InsuranceSection = () => (
             <div className="p-3 rounded-xl bg-primary/10 inline-block mb-4">
               <Shield className="h-8 w-8 text-primary" />
             </div>
-            <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-3">
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-3">
               Save with Insurance
             </h2>
             <p className="text-muted-foreground mb-4">
