@@ -6,12 +6,6 @@ const features = [
   { icon: HeartHandshake, title: "End-to-End Support", desc: "Dedicated care manager throughout" },
 ];
 
-const stats = [
-  { value: "5,000+", label: "Surgeries Completed" },
-  { value: "98%", label: "Patient Satisfaction" },
-  { value: "50+", label: "Expert Surgeons" },
-  { value: "10+", label: "Partner Hospitals" },
-];
 
 const FutureBanner = () => (
   <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 py-16 md:py-24">
@@ -48,17 +42,6 @@ const FutureBanner = () => (
         ))}
       </div>
 
-      {/* Stats row */}
-      <div className="border-t border-primary-foreground/15 pt-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center">
-              <p className="font-serif text-2xl md:text-3xl font-bold text-primary-foreground">{s.value}</p>
-              <p className="text-xs md:text-sm text-primary-foreground/60 mt-1">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   </section>
 );
