@@ -75,7 +75,7 @@ const HeroSection = () => {
 
           {/* Right: Image with floating stats */}
           <div className="relative flex justify-center md:justify-end animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <div className="relative w-full max-w-md">
+            <div className="relative w-full max-w-lg lg:max-w-xl">
               <div className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border border-primary-foreground/10">
                 <img
                   src={heroImage}
@@ -107,15 +107,6 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Bottom wave divider */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
-        <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="w-full h-8 md:h-12">
-          <path
-            d="M0,40 C360,80 1080,0 1440,40 L1440,60 L0,60 Z"
-            fill="hsl(var(--background))"
-          />
-        </svg>
-      </div>
 
       <LeadFormModal open={formOpen} onOpenChange={setFormOpen} />
     </section>
