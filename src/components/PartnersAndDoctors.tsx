@@ -112,10 +112,12 @@ const PartnersAndDoctors = () => {
 
         {/* View All button */}
         <div className="mt-10">
-          <Button variant="outline" className="group rounded-full">
-            View All Doctor Profiles
-            <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
-          </Button>
+          <Link to="/doctors">
+            <Button variant="outline" className="group rounded-full">
+              View All Doctor Profiles
+              <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
         </div>
       </div>
 
