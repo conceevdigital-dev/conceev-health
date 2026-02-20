@@ -8,16 +8,25 @@ const metrics = [
 ];
 
 const TrustMetrics = () => (
-  <section className="bg-primary py-5">
-    <div className="container mx-auto px-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-        {metrics.map(({ icon: Icon, value, label }) => (
-          <div key={label} className="space-y-1">
-            <Icon className="h-5 w-5 mx-auto text-primary-foreground/70" />
-            <p className="text-2xl font-bold text-primary-foreground">{value}</p>
-            <p className="text-xs text-primary-foreground/70">{label}</p>
-          </div>
-        ))}
+  <section className="relative -mt-8 z-20 px-4">
+    <div className="container mx-auto max-w-5xl">
+      <div className="bg-primary rounded-2xl shadow-xl shadow-primary/30 py-8 px-6 md:px-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+          {metrics.map(({ icon: Icon, value, label }, i) => (
+            <div
+              key={label}
+              className={`flex flex-col items-center text-center space-y-2 ${
+                i < metrics.length - 1 ? "md:border-r md:border-primary-foreground/15" : ""
+              }`}
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary-foreground/10 flex items-center justify-center">
+                <Icon className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <p className="text-3xl md:text-4xl font-bold text-primary-foreground tracking-tight">{value}</p>
+              <p className="text-sm text-primary-foreground/70 font-medium">{label}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   </section>
