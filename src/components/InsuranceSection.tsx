@@ -4,7 +4,7 @@ const insurers = ["Star Health", "HDFC Ergo", "ICICI Lombard", "Bajaj Allianz", 
 
 const InsuranceSection = () => (
   <section className="py-16 md:py-20 bg-background">
-    <div className="container mx-auto px-4 max-w-5xl">
+    <div className="container mx-auto px-4">
       <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-3xl border border-primary/20 p-8 md:p-12">
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 const PromoCards = () => (
   <section className="py-16 md:py-20 bg-background">
     <div className="container mx-auto px-4">
-      <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+      <div className="grid md:grid-cols-2 gap-6">
         {/* Insurance Card */}
         <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl border border-primary/20 p-8">
           <div className="flex items-start gap-4">

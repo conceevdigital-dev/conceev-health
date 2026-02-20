@@ -70,7 +70,7 @@ const FAQSection = () => {
   return (
     <section id="faqs" className="py-16 md:py-20 bg-background">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
+        <div className="grid md:grid-cols-3 gap-8 items-start">
           {/* FAQ Column */}
           <div className="md:col-span-2">
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-8 text-foreground">

@@ -21,7 +21,7 @@ const advantages = {
 
 const AdvantageSection = () => (
   <section className="py-16 md:py-20 bg-secondary/30">
-    <div className="container mx-auto px-4 max-w-4xl">
+    <div className="container mx-auto px-4">
       <h2 className="font-serif text-3xl md:text-4xl font-bold text-center mb-4 text-foreground">
         The Conceev Advantage
       </h2>
