@@ -6,29 +6,29 @@ const features = [
     icon: Clock,
     title: "Easy Scheduling",
     desc: "Book your surgery within 3–7 days. No long queues, no wait.",
-    color: "from-blue-500/20 to-blue-600/10",
-    iconBg: "bg-blue-500",
+    color: "from-primary/20 to-primary/10",
+    iconBg: "bg-primary",
   },
   {
     icon: IndianRupee,
     title: "Fixed Pricing",
     desc: "Transparent costs with zero hidden charges. Know before you go.",
-    color: "from-emerald-500/20 to-emerald-600/10",
-    iconBg: "bg-emerald-500",
+    color: "from-green-success/20 to-green-success/10",
+    iconBg: "bg-green-success",
   },
   {
     icon: Shield,
     title: "Trusted Hospitals",
     desc: "Only NABH-accredited & vetted partner hospitals near you.",
-    color: "from-amber-500/20 to-amber-600/10",
-    iconBg: "bg-amber-500",
+    color: "from-accent/20 to-accent/10",
+    iconBg: "bg-accent",
   },
   {
     icon: HeartHandshake,
     title: "Dedicated Coordinator",
     desc: "Personal support from first consult through full recovery.",
-    color: "from-rose-500/20 to-rose-600/10",
-    iconBg: "bg-rose-500",
+    color: "from-destructive/20 to-destructive/10",
+    iconBg: "bg-destructive",
   },
 ];
 
@@ -44,7 +44,7 @@ const WhyChooseUs = () => (
         <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4 tracking-wide">
           WHY CONCEEV HEALTH
         </span>
-        <h2 className="font-serif text-3xl md:text-5xl font-bold text-foreground leading-tight">
+        <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground leading-tight">
           Surgery Made <span className="text-primary">Simple & Safe</span>
         </h2>
         <p className="mt-4 text-muted-foreground text-base md:text-lg">

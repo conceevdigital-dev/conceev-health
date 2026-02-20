@@ -64,7 +64,7 @@ const PackageDetail = () => {
             </div>
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="font-serif text-3xl md:text-4xl font-bold">{pkg.title}</h1>
+                <h1 className="font-serif text-4xl md:text-5xl font-bold">{pkg.title}</h1>
                 {pkg.tag && (
                   <span className="text-xs font-semibold bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full">
                     {pkg.tag}
@@ -173,7 +173,7 @@ const PackageDetail = () => {
                           {Array.from({ length: 5 }).map((_, j) => (
                             <Star
                               key={j}
-                              className={`h-4 w-4 ${j < review.rating ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground/30"}`}
+                              className={`h-4 w-4 ${j < review.rating ? "text-amber-400 fill-amber-400" : "text-muted-foreground/30"}`}
                             />
                           ))}
                         </div>

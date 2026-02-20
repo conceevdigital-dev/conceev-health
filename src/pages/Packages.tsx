@@ -114,7 +114,7 @@ const Packages = () => {
       {/* CTA */}
       <section className="bg-secondary/50 py-12">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-3">
+          <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-3">
             Not sure which package is right for you?
           </h2>
           <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
