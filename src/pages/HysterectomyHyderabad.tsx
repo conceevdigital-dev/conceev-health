@@ -25,10 +25,10 @@ const HysterectomyHyderabad = () => {
       <Navbar />
       <main>
         {/* Hero */}
-        <section className="bg-gradient-to-br from-purple-light via-background to-rose-light py-16 md:py-24">
+        <section className="bg-gradient-to-br from-secondary via-background to-blue-light py-16 md:py-24">
           <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <span className="inline-block text-xs font-bold text-accent bg-purple-light px-3 py-1 rounded-full">Gynecology Surgery</span>
+              <span className="inline-block text-xs font-bold text-accent bg-secondary px-3 py-1 rounded-full">Gynecology Surgery</span>
               <h1 className="font-serif text-4xl md:text-5xl font-bold leading-tight">
                 Hysterectomy Package in <span className="text-accent">Hyderabad & Bangalore</span>
               </h1>

@@ -25,10 +25,10 @@ const IVFBangalore = () => {
       <Navbar />
       <main>
         {/* Hero */}
-        <section className="bg-gradient-to-br from-rose-light via-background to-purple-light py-16 md:py-24">
+        <section className="bg-gradient-to-br from-blue-light via-background to-secondary py-16 md:py-24">
           <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <span className="inline-block text-xs font-bold text-primary bg-rose-light px-3 py-1 rounded-full">IVF Treatment</span>
+              <span className="inline-block text-xs font-bold text-primary bg-blue-light px-3 py-1 rounded-full">IVF Treatment</span>
               <h1 className="font-serif text-4xl md:text-5xl font-bold leading-tight">
                 IVF Treatment Package in <span className="text-primary">Bangalore & Hyderabad</span>
               </h1>
