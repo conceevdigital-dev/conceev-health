@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Shield, Building2, UserCheck } from "lucide-react";
 import LeadFormModal from "./LeadFormModal";
+import heroImage from "@/assets/hero-doctor-patient.jpg";
 
 const HeroSection = () => {
   const [formOpen, setFormOpen] = useState(false);
@@ -40,12 +41,11 @@ const HeroSection = () => {
             </div>
           </div>
           <div className="relative hidden md:block">
-            <div className="aspect-[4/3] rounded-3xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center border border-border">
-              <div className="text-center space-y-2 text-muted-foreground">
-                <Building2 className="h-16 w-16 mx-auto text-primary/40" />
-                <p className="text-sm">Doctor & Patient Image</p>
-              </div>
-            </div>
+            <img
+              src={heroImage}
+              alt="Doctor consulting with a patient in a modern healthcare setting"
+              className="rounded-3xl object-cover w-full aspect-[4/3] shadow-lg border border-border"
+            />
           </div>
         </div>
       </div>
