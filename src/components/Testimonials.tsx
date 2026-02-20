@@ -1,20 +1,17 @@
 import { useState } from "react";
 import { Star, Quote } from "lucide-react";
+import testimonialPriya from "@/assets/testimonial-priya.jpg";
+import testimonialAnanya from "@/assets/testimonial-ananya.jpg";
+import testimonialDeepa from "@/assets/testimonial-deepa.jpg";
+import testimonialKavitha from "@/assets/testimonial-kavitha.jpg";
+import testimonialMeera from "@/assets/testimonial-meera.jpg";
 
 const testimonials = [
-  { quote: "Conceev Health made my IVF journey smooth and stress-free. The coordinator was amazing throughout!", name: "Priya S.", area: "Whitefield, Bangalore", rating: 4.8, initials: "PS" },
-  { quote: "Transparent pricing and no surprises. I knew exactly what I was paying for my hysterectomy. The team was incredibly supportive and made the entire process worry-free.", name: "Ananya R.", area: "Kukatpally, Hyderabad", rating: 4.7, initials: "AR" },
-  { quote: "Found the best hospital near me within a day. The care manager was with me from consultation to discharge. I felt heard and cared for every step of the way.", name: "Deepa M.", area: "HSR Layout, Bangalore", rating: 4.9, initials: "DM" },
-  { quote: "EMI option helped me afford my treatment without any financial stress. Highly recommend Conceev Health to anyone looking for transparent and compassionate healthcare support!", name: "Kavitha J.", area: "Gachibowli, Hyderabad", rating: 4.6, initials: "KJ" },
-  { quote: "The dedicated coordinator made all the difference. From finding the right doctor to post-surgery follow-ups, everything was taken care of seamlessly.", name: "Meera L.", area: "Koramangala, Bangalore", rating: 4.8, initials: "ML" },
-];
-
-const COLORS = [
-  "bg-rose-200 text-rose-700",
-  "bg-purple-200 text-purple-700",
-  "bg-amber-200 text-amber-700",
-  "bg-teal-200 text-teal-700",
-  "bg-sky-200 text-sky-700",
+  { quote: "Conceev Health made my IVF journey smooth and stress-free. The coordinator was amazing throughout!", name: "Priya S.", area: "Whitefield, Bangalore", rating: 4.8, image: testimonialPriya },
+  { quote: "Transparent pricing and no surprises. I knew exactly what I was paying for my hysterectomy. The team was incredibly supportive and made the entire process worry-free.", name: "Ananya R.", area: "Kukatpally, Hyderabad", rating: 4.7, image: testimonialAnanya },
+  { quote: "Found the best hospital near me within a day. The care manager was with me from consultation to discharge. I felt heard and cared for every step of the way.", name: "Deepa M.", area: "HSR Layout, Bangalore", rating: 4.9, image: testimonialDeepa },
+  { quote: "EMI option helped me afford my treatment without any financial stress. Highly recommend Conceev Health to anyone looking for transparent and compassionate healthcare support!", name: "Kavitha J.", area: "Gachibowli, Hyderabad", rating: 4.6, image: testimonialKavitha },
+  { quote: "The dedicated coordinator made all the difference. From finding the right doctor to post-surgery follow-ups, everything was taken care of seamlessly.", name: "Meera L.", area: "Koramangala, Bangalore", rating: 4.8, image: testimonialMeera },
 ];
 
 const Testimonials = () => {
@@ -51,9 +48,7 @@ const Testimonials = () => {
                       : "w-20 h-28 md:w-28 md:h-36 opacity-70 hover:opacity-100 grayscale hover:grayscale-0"
                   }`}
                 >
-                  <div className={`w-full h-full flex items-center justify-center ${COLORS[i]} text-2xl md:text-3xl font-bold`}>
-                    {item.initials}
-                  </div>
+                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   {isActive && (
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-card px-2 py-0.5 rounded-full shadow text-sm font-semibold">
                       <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
