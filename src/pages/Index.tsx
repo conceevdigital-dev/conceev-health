@@ -1,14 +1,43 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import TrustMetrics from "@/components/TrustMetrics";
+import ProblemSection from "@/components/ProblemSection";
+import SpecialtiesGrid from "@/components/SpecialtiesGrid";
+import HowItWorks from "@/components/HowItWorks";
+import FeaturedPackages from "@/components/FeaturedPackages";
+import WhyChooseUs from "@/components/WhyChooseUs";
+import PartnersAndDoctors from "@/components/PartnersAndDoctors";
+import PackageInclusions from "@/components/PackageInclusions";
+import Testimonials from "@/components/Testimonials";
+import CityCoverage from "@/components/CityCoverage";
+import FAQSection from "@/components/FAQSection";
+import FinalCTA from "@/components/FinalCTA";
+import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import MobileBottomBar from "@/components/MobileBottomBar";
 
-const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
-};
+const Index = () => (
+  <div className="min-h-screen">
+    <Navbar />
+    <main>
+      <HeroSection />
+      <TrustMetrics />
+      <ProblemSection />
+      <SpecialtiesGrid />
+      <HowItWorks />
+      <FeaturedPackages />
+      <WhyChooseUs />
+      <PartnersAndDoctors />
+      <PackageInclusions />
+      <Testimonials />
+      <CityCoverage />
+      <FAQSection />
+      <FinalCTA />
+    </main>
+    <Footer />
+    <WhatsAppButton />
+    <MobileBottomBar />
+  </div>
+);
 
 export default Index;
