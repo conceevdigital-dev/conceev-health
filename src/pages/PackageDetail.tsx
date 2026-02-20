@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, MapPin, Clock, CalendarCheck, CheckCircle2, Building2, ArrowRight, Star, Users, TrendingUp } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, CalendarCheck, CheckCircle2, Building2, ArrowRight, Star, Users, TrendingUp, ChevronRight, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -56,9 +56,16 @@ const PackageDetail = () => {
       {/* Hero */}
       <section className="bg-navy text-primary-foreground py-14 md:py-20">
         <div className="container mx-auto px-4">
-          <Link to="/packages" className="inline-flex items-center gap-1.5 text-sm text-primary-foreground/60 hover:text-primary-foreground mb-6">
-            <ArrowLeft className="h-4 w-4" /> All Packages
-          </Link>
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-1.5 text-sm text-primary-foreground/50 mb-6" aria-label="Breadcrumb">
+            <Link to="/" className="hover:text-primary-foreground transition-colors flex items-center gap-1">
+              <Home className="h-3.5 w-3.5" /> Home
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <Link to="/packages" className="hover:text-primary-foreground transition-colors">Packages</Link>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="text-primary-foreground font-medium">{pkg.title}</span>
+          </nav>
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-2xl bg-primary-foreground/10 flex items-center justify-center shrink-0">
               <pkg.icon className="h-7 w-7 text-primary-foreground" />
