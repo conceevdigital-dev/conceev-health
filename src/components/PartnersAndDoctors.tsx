@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import LeadFormModal from "./LeadFormModal";
 import { doctors } from "@/data/doctors";
 
+// Derive hospital filter dynamically from doctor data
+const allHospitalNames = [...new Set(doctors.flatMap((d) => d.hospitals))];
 const hospitals = [
-  { name: "All", doctors: ["Dr. Priya Sharma", "Dr. Anita Reddy", "Dr. Meera Krishnan"] },
-  { name: "Apollo Hospitals", doctors: ["Dr. Priya Sharma", "Dr. Meera Krishnan"] },
-  { name: "Fortis Healthcare", doctors: ["Dr. Anita Reddy"] },
-  { name: "Manipal Hospital", doctors: ["Dr. Priya Sharma", "Dr. Anita Reddy"] },
-  { name: "Narayana Health", doctors: ["Dr. Meera Krishnan"] },
-  { name: "Rainbow Hospital", doctors: ["Dr. Anita Reddy", "Dr. Meera Krishnan"] },
+  { name: "All", doctors: doctors.map((d) => d.name) },
+  ...allHospitalNames.map((h) => ({
+    name: h,
+    doctors: doctors.filter((d) => d.hospitals.includes(h)).map((d) => d.name),
+  })),
 ];
 
 const allDoctors = doctors;
