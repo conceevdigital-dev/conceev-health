@@ -1,16 +1,16 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import TrustMetrics from "@/components/TrustMetrics";
-import ProblemSection from "@/components/ProblemSection";
-import SpecialtiesGrid from "@/components/SpecialtiesGrid";
-import HowItWorks from "@/components/HowItWorks";
-import FeaturedPackages from "@/components/FeaturedPackages";
 import WhyChooseUs from "@/components/WhyChooseUs";
+import SpecialtiesGrid from "@/components/SpecialtiesGrid";
+import TrustMetrics from "@/components/TrustMetrics";
 import PartnersAndDoctors from "@/components/PartnersAndDoctors";
-import PackageInclusions from "@/components/PackageInclusions";
+import FutureBanner from "@/components/FutureBanner";
+import PromoCards from "@/components/PromoCards";
 import Testimonials from "@/components/Testimonials";
+import InsuranceSection from "@/components/InsuranceSection";
 import CityCoverage from "@/components/CityCoverage";
 import FAQSection from "@/components/FAQSection";
+import AdvantageSection from "@/components/AdvantageSection";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -21,17 +21,17 @@ const Index = () => (
     <Navbar />
     <main>
       <HeroSection />
-      <TrustMetrics />
-      <ProblemSection />
-      <SpecialtiesGrid />
-      <HowItWorks />
-      <FeaturedPackages />
       <WhyChooseUs />
+      <SpecialtiesGrid />
+      <TrustMetrics />
       <PartnersAndDoctors />
-      <PackageInclusions />
+      <FutureBanner />
+      <PromoCards />
       <Testimonials />
+      <InsuranceSection />
       <CityCoverage />
       <FAQSection />
+      <AdvantageSection />
       <FinalCTA />
     </main>
     <Footer />

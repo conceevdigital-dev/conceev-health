@@ -1,7 +1,7 @@
 import { Phone } from "lucide-react";
 
 const MobileBottomBar = () => (
-  <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-primary p-3 shadow-lg">
+  <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-navy p-3 shadow-lg">
     <a
       href="tel:+919876543210"
       className="flex items-center justify-center gap-2 text-primary-foreground font-semibold text-sm"
