@@ -1,4 +1,4 @@
-import { Zap, Shield, HeartHandshake } from "lucide-react";
+import { Zap, Shield, HeartHandshake, Clock, Stethoscope, Users } from "lucide-react";
 
 const features = [
   { icon: Zap, title: "Quick Scheduling", desc: "Surgery booked within 3-7 days" },
@@ -6,22 +6,58 @@ const features = [
   { icon: HeartHandshake, title: "End-to-End Support", desc: "Dedicated care manager throughout" },
 ];
 
+const stats = [
+  { value: "5,000+", label: "Surgeries Completed" },
+  { value: "98%", label: "Patient Satisfaction" },
+  { value: "50+", label: "Expert Surgeons" },
+  { value: "10+", label: "Partner Hospitals" },
+];
+
 const FutureBanner = () => (
-  <section className="bg-primary py-12 md:py-16">
-    <div className="container mx-auto px-4">
-      <h2 className="font-serif text-3xl md:text-4xl font-bold text-center text-primary-foreground mb-10">
-        Welcome to the Future of Surgical Care
-      </h2>
-      <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+  <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/80 py-16 md:py-24">
+    {/* Decorative background elements */}
+    <div className="absolute inset-0 opacity-10">
+      <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary-foreground rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary-foreground rounded-full blur-3xl" />
+    </div>
+
+    <div className="container mx-auto px-4 relative z-10">
+      {/* Heading */}
+      <div className="text-center mb-14">
+        <h2 className="font-serif text-3xl md:text-5xl font-bold text-primary-foreground mb-4 leading-tight">
+          Welcome to the Future<br className="hidden md:block" /> of Surgical Care
+        </h2>
+        <p className="text-primary-foreground/70 max-w-xl mx-auto text-sm md:text-base">
+          Transparent pricing, top hospitals, and compassionate support — all in one place.
+        </p>
+      </div>
+
+      {/* Feature cards */}
+      <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-16">
         {features.map(({ icon: Icon, title, desc }) => (
-          <div key={title} className="text-center">
-            <div className="w-14 h-14 rounded-full bg-primary-foreground/10 mx-auto flex items-center justify-center mb-3">
+          <div
+            key={title}
+            className="text-center group"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-primary-foreground/15 backdrop-blur-sm mx-auto flex items-center justify-center mb-4 group-hover:bg-primary-foreground/25 group-hover:scale-110 transition-all duration-300">
               <Icon className="h-7 w-7 text-primary-foreground" />
             </div>
-            <h3 className="font-serif font-bold text-sm text-primary-foreground mb-1">{title}</h3>
-            <p className="text-xs text-primary-foreground/70">{desc}</p>
+            <h3 className="font-serif font-bold text-base md:text-lg text-primary-foreground mb-1">{title}</h3>
+            <p className="text-sm text-primary-foreground/60">{desc}</p>
           </div>
         ))}
+      </div>
+
+      {/* Stats row */}
+      <div className="border-t border-primary-foreground/15 pt-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
+          {stats.map((s) => (
+            <div key={s.label} className="text-center">
+              <p className="font-serif text-2xl md:text-3xl font-bold text-primary-foreground">{s.value}</p>
+              <p className="text-xs md:text-sm text-primary-foreground/60 mt-1">{s.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   </section>
