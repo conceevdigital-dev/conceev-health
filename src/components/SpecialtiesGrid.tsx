@@ -98,9 +98,11 @@ const SpecialtiesGrid = () => {
         </div>
 
         <div className="text-center mt-8">
-          <Button variant="default" className="rounded-full gap-2">
-            View All Packages <ArrowRight className="h-4 w-4" />
-          </Button>
+          <Link to="/packages">
+            <Button variant="default" className="rounded-full gap-2">
+              View All Packages <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
