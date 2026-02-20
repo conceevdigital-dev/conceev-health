@@ -167,6 +167,7 @@ const Doctors = () => {
                   <h3 className="font-serif font-bold text-foreground text-lg leading-tight">{d.name}</h3>
                   <p className="text-sm text-primary font-medium mt-0.5">{d.designation}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{d.experience} experience</p>
+                  <p className="text-sm font-semibold text-foreground mt-1">{d.consultationFee} <span className="text-xs font-normal text-muted-foreground">consultation</span></p>
                 </div>
               </div>
 
