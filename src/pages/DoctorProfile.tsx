@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Star, MapPin, Building2, Calendar, Phone, Globe, GraduationCap, Stethoscope, Award, Clock, IndianRupee } from "lucide-react";
+import { ArrowLeft, Star, MapPin, Building2, Calendar, Phone, Globe, GraduationCap, Stethoscope, Award, Clock, IndianRupee, ChevronRight, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -40,9 +40,16 @@ const DoctorProfile = () => {
       {/* Hero */}
       <section className="bg-navy text-primary-foreground py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <Link to="/#surgeons" className="inline-flex items-center gap-1.5 text-sm text-primary-foreground/60 hover:text-primary-foreground mb-6 transition-colors">
-            <ArrowLeft className="h-4 w-4" /> Back to All Doctors
-          </Link>
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-1.5 text-sm text-primary-foreground/50 mb-6" aria-label="Breadcrumb">
+            <Link to="/" className="hover:text-primary-foreground transition-colors flex items-center gap-1">
+              <Home className="h-3.5 w-3.5" /> Home
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <Link to="/doctors" className="hover:text-primary-foreground transition-colors">Doctors</Link>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="text-primary-foreground font-medium">{doctor.name}</span>
+          </nav>
 
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
             {/* Avatar */}
