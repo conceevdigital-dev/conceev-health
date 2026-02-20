@@ -43,7 +43,34 @@ const Footer = () => (
           </ul>
         </div>
       </div>
-      <div className="border-t border-primary-foreground/10 mt-8 pt-6 text-center text-xs text-primary-foreground/40">
+
+      {/* Most Popular Treatments */}
+      <div className="border-t border-primary-foreground/10 mt-8 pt-6">
+        <h4 className="font-semibold text-sm mb-3">Our Most Popular Treatments</h4>
+        <p className="text-sm text-primary-foreground/60 leading-relaxed">
+          {["IVF Treatment", "IUI Treatment", "Hysterectomy", "Fibroid Surgery", "Ovarian Cyst Removal", "C-Section Delivery", "Normal Delivery", "Laparoscopic Surgery", "Endometriosis Treatment", "PCOS Management"].map((t, i, arr) => (
+            <span key={t}>
+              <a href="#specialties" className="hover:text-primary-foreground transition-colors">{t}</a>
+              {i < arr.length - 1 && <span className="mx-2 text-primary-foreground/30">|</span>}
+            </span>
+          ))}
+        </p>
+      </div>
+
+      {/* Most Popular Treatment Costs */}
+      <div className="mt-6">
+        <h4 className="font-semibold text-sm mb-3">Most Popular Treatment Costs</h4>
+        <p className="text-sm text-primary-foreground/60 leading-relaxed">
+          {["IVF Cost Estimate", "IUI Cost Estimate", "Hysterectomy Cost Estimate", "Fibroid Surgery Cost Estimate", "C-Section Cost Estimate", "Laparoscopic Surgery Cost Estimate", "Ovarian Cyst Removal Cost Estimate", "Endometriosis Treatment Cost Estimate"].map((t, i, arr) => (
+            <span key={t}>
+              <a href="#packages" className="hover:text-primary-foreground transition-colors">{t}</a>
+              {i < arr.length - 1 && <span className="mx-2 text-primary-foreground/30">|</span>}
+            </span>
+          ))}
+        </p>
+      </div>
+
+      <div className="border-t border-primary-foreground/10 mt-6 pt-6 text-center text-xs text-primary-foreground/40">
         © 2026 Conceev Health. All rights reserved. · <a href="#" className="hover:text-primary-foreground">Privacy Policy</a> · <a href="#" className="hover:text-primary-foreground">Terms</a>
       </div>
     </div>
