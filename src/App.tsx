@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import IVFBangalore from "./pages/IVFBangalore";
 import HysterectomyHyderabad from "./pages/HysterectomyHyderabad";
 import Packages from "./pages/Packages";
+import PackageDetail from "./pages/PackageDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/ivf-bangalore" element={<IVFBangalore />} />
           <Route path="/hysterectomy-hyderabad" element={<HysterectomyHyderabad />} />
           <Route path="/packages" element={<Packages />} />
+          <Route path="/packages/:slug" element={<PackageDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
