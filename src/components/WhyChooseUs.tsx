@@ -53,7 +53,7 @@ const WhyChooseUs = () => (
       </div>
 
       {/* Main content */}
-      <div className="grid lg:grid-cols-5 gap-8 max-w-6xl mx-auto items-stretch">
+      <div className="grid lg:grid-cols-5 gap-8 items-stretch">
         {/* Image side — spans 2 cols */}
         <div className="lg:col-span-2 relative group">
           <div className="rounded-2xl overflow-hidden shadow-xl h-full min-h-[340px] relative">

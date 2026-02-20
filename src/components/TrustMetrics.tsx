@@ -9,7 +9,7 @@ const metrics = [
 
 const TrustMetrics = () => (
   <section className="relative -mt-8 z-20 px-4">
-    <div className="container mx-auto max-w-5xl">
+    <div className="container mx-auto">
       <div className="bg-primary rounded-2xl shadow-xl shadow-primary/30 py-8 px-6 md:px-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           {metrics.map(({ icon: Icon, value, label }, i) => (
