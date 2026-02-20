@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Search, Calendar, User, MapPin, X } from "lucide-react";
+import { Search, Calendar, User, MapPin, X, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -20,9 +20,13 @@ const Doctors = () => {
   const [hospitalFilter, setHospitalFilter] = useState<string | null>(null);
   const [specFilter, setSpecFilter] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("default");
+
+  const parseExp = (exp: string) => parseInt(exp.replace(/\D/g, "")) || 0;
+  const parseFee = (fee: string) => parseInt(fee.replace(/[^\d]/g, "")) || 0;
 
   const filtered = useMemo(() => {
-    return doctors.filter((d) => {
+    const result = doctors.filter((d) => {
       const q = search.toLowerCase();
       const matchesSearch =
         !q ||
@@ -34,7 +38,14 @@ const Doctors = () => {
       const matchesSpec = !specFilter || d.specializations.includes(specFilter);
       return matchesSearch && matchesCity && matchesHospital && matchesSpec;
     });
-  }, [search, cityFilter, hospitalFilter, specFilter]);
+
+    if (sortBy === "experience-high") result.sort((a, b) => parseExp(b.experience) - parseExp(a.experience));
+    else if (sortBy === "experience-low") result.sort((a, b) => parseExp(a.experience) - parseExp(b.experience));
+    else if (sortBy === "fee-low") result.sort((a, b) => parseFee(a.consultationFee) - parseFee(b.consultationFee));
+    else if (sortBy === "fee-high") result.sort((a, b) => parseFee(b.consultationFee) - parseFee(a.consultationFee));
+
+    return result;
+  }, [search, cityFilter, hospitalFilter, specFilter, sortBy]);
 
   const activeFilters = [cityFilter, hospitalFilter, specFilter].filter(Boolean).length;
 
@@ -121,10 +132,25 @@ const Doctors = () => {
           </div>
         </div>
 
-        {/* Results count */}
-        <p className="text-sm text-muted-foreground mb-6">
-          Showing <span className="font-semibold text-foreground">{filtered.length}</span> doctor{filtered.length !== 1 ? "s" : ""}
-        </p>
+        {/* Results count + Sort */}
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-sm text-muted-foreground">
+            Showing <span className="font-semibold text-foreground">{filtered.length}</span> doctor{filtered.length !== 1 ? "s" : ""}
+          </p>
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[200px] rounded-full">
+              <ArrowUpDown className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">Default</SelectItem>
+              <SelectItem value="experience-high">Experience: High to Low</SelectItem>
+              <SelectItem value="experience-low">Experience: Low to High</SelectItem>
+              <SelectItem value="fee-low">Fee: Low to High</SelectItem>
+              <SelectItem value="fee-high">Fee: High to Low</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Doctor grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
