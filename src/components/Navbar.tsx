@@ -4,11 +4,11 @@ import { Phone, Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
-  { label: "Treatments", href: "#specialties" },
-  { label: "Surgeons", href: "#surgeons" },
-  { label: "Cities", href: "#cities" },
-  { label: "Why Us", href: "#why-us" },
+  { label: "Home", href: "/" },
+  { label: "Doctors", href: "/doctors" },
+  { label: "Packages", href: "/packages" },
   { label: "FAQs", href: "#faqs" },
+  { label: "Contact Us", href: "#contact" },
 ];
 
 const Navbar = () => {
@@ -22,11 +22,17 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-6">
-          {navLinks.map((l) => (
-            <a key={l.label} href={l.href} className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
-              {l.label}
-            </a>
-          ))}
+          {navLinks.map((l) =>
+            l.href.startsWith("/") ? (
+              <Link key={l.label} to={l.href} className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
+                {l.label}
+              </Link>
+            ) : (
+              <a key={l.label} href={l.href} className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
+                {l.label}
+              </a>
+            )
+          )}
         </div>
 
         <div className="hidden md:flex items-center gap-3">
@@ -45,11 +51,17 @@ const Navbar = () => {
 
       {mobileOpen && (
         <div className="md:hidden bg-card border-b border-border px-4 pb-4 space-y-1 animate-fade-in">
-          {navLinks.map((l) => (
-            <a key={l.label} href={l.href} onClick={() => setMobileOpen(false)} className="block text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 rounded-xl py-3 px-3 transition-colors">
-              {l.label}
-            </a>
-          ))}
+          {navLinks.map((l) =>
+            l.href.startsWith("/") ? (
+              <Link key={l.label} to={l.href} onClick={() => setMobileOpen(false)} className="block text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 rounded-xl py-3 px-3 transition-colors">
+                {l.label}
+              </Link>
+            ) : (
+              <a key={l.label} href={l.href} onClick={() => setMobileOpen(false)} className="block text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 rounded-xl py-3 px-3 transition-colors">
+                {l.label}
+              </a>
+            )
+          )}
           <div className="pt-2 space-y-2">
             <Button size="sm" variant="outline" className="w-full rounded-full gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
               <Phone className="h-4 w-4" /> Call Now
