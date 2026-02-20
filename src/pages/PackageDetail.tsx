@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, MapPin, Clock, CalendarCheck, CheckCircle2, Building2, ArrowRight } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, CalendarCheck, CheckCircle2, Building2, ArrowRight, Star, Users, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -129,6 +129,56 @@ const PackageDetail = () => {
                           ))}
                         </div>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Success Rate & Stats */}
+              <div>
+                <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Success Rate & Stats</h2>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-card rounded-xl border border-border p-5 text-center">
+                    <TrendingUp className="h-6 w-6 text-primary mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{pkg.successRate}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Success Rate</p>
+                  </div>
+                  <div className="bg-card rounded-xl border border-border p-5 text-center">
+                    <Users className="h-6 w-6 text-primary mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{pkg.totalPatients}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Patients Treated</p>
+                  </div>
+                  <div className="bg-card rounded-xl border border-border p-5 text-center">
+                    <Star className="h-6 w-6 text-primary mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{pkg.avgRating}/5</p>
+                    <p className="text-xs text-muted-foreground mt-1">Avg Rating</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Patient Reviews */}
+              <div>
+                <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Patient Reviews</h2>
+                <div className="space-y-4">
+                  {pkg.reviews.map((review, i) => (
+                    <div key={i} className="bg-card rounded-xl border border-border p-5">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <p className="text-sm font-bold text-foreground">{review.name}</p>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <MapPin className="h-3 w-3" /> {review.city}
+                          </p>
+                        </div>
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: 5 }).map((_, j) => (
+                            <Star
+                              key={j}
+                              className={`h-4 w-4 ${j < review.rating ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground/30"}`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">"{review.text}"</p>
                     </div>
                   ))}
                 </div>
