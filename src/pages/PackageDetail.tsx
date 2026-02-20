@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Clock, CalendarCheck, CheckCircle2, Building2, ArrowRight, Star, Users, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LeadFormModal from "@/components/LeadFormModal";
-import { getPackageBySlug } from "@/data/packages";
+import { getPackageBySlug, allPackages } from "@/data/packages";
 
 // Reuse hospital data from CityCoverage
 const hospitals = [
@@ -47,6 +47,7 @@ const PackageDetail = () => {
 
   // Filter hospitals available in the package's cities
   const availableHospitals = hospitals.filter((h) => pkg.cities.includes(h.city));
+  const relatedPackages = allPackages.filter((p) => p.specialty === pkg.specialty && p.slug !== pkg.slug).slice(0, 3);
 
   return (
     <div className="min-h-screen bg-background">
@@ -212,6 +213,39 @@ const PackageDetail = () => {
           </div>
         </div>
       </section>
+
+      {/* Related Packages */}
+      {relatedPackages.length > 0 && (
+        <section className="py-12 md:py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8">Other {pkg.specialty} Packages</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedPackages.map((rp) => (
+                <Link key={rp.slug} to={`/packages/${rp.slug}`} className="group">
+                  <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-lg hover:border-primary/30 transition-all duration-300 h-full flex flex-col">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                        <rp.icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-serif font-bold text-foreground group-hover:text-primary transition-colors">{rp.title}</h3>
+                        {rp.tag && <span className="text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{rp.tag}</span>}
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">{rp.desc}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-primary">{rp.price}</span>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <MapPin className="h-3 w-3" /> {rp.cities.join(", ")}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <Footer />
       <LeadFormModal open={formOpen} onOpenChange={setFormOpen} sourcePage={`package-${slug}`} />
