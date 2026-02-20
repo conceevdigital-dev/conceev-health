@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Search, Shield, Building2, HeartHandshake, Sparkles, Star, Activity } from "lucide-react";
 import LeadFormModal from "./LeadFormModal";
@@ -52,9 +53,9 @@ const HeroSection = () => {
                 className="rounded-full text-base px-8 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
                 asChild
               >
-                <a href="#packages">
+                <Link to="/packages">
                   <Search className="h-4 w-4 mr-2" /> View Packages
-                </a>
+                </Link>
               </Button>
             </div>
 
