@@ -44,40 +44,24 @@ const Footer = () => (
         </div>
       </div>
 
-      {/* Most Popular Treatments by Specialty */}
-      <div className="border-t border-primary-foreground/10 mt-8 pt-6 space-y-5">
-        <h4 className="font-semibold text-sm">Our Most Popular Treatments</h4>
-
+      {/* Treatments by Specialty */}
+      <div className="border-t border-primary-foreground/10 mt-8 pt-6 grid sm:grid-cols-3 gap-6">
         {[
           { specialty: "Gynaecology", treatments: ["Hysterectomy", "Fibroid Surgery", "Ovarian Cyst Removal", "Laparoscopic Surgery", "Endometriosis Treatment", "PCOS Management", "Uterine Prolapse Surgery"] },
           { specialty: "Maternity", treatments: ["Normal Delivery", "C-Section Delivery", "High-Risk Pregnancy Care", "Prenatal Screening", "Postpartum Care"] },
           { specialty: "Fertility", treatments: ["IVF Treatment", "IUI Treatment", "Egg Freezing", "ICSI Treatment", "Fertility Assessment", "Male Infertility Treatment"] },
         ].map((s) => (
           <div key={s.specialty}>
-            <h5 className="text-xs font-semibold text-primary-foreground/80 mb-1.5">{s.specialty}</h5>
-            <p className="text-sm text-primary-foreground/60 leading-relaxed">
-              {s.treatments.map((t, i, arr) => (
-                <span key={t}>
+            <h4 className="font-serif text-base font-bold text-primary-foreground mb-3">{s.specialty}</h4>
+            <ul className="space-y-1.5 text-sm text-primary-foreground/60">
+              {s.treatments.map((t) => (
+                <li key={t}>
                   <a href="#specialties" className="hover:text-primary-foreground transition-colors">{t}</a>
-                  {i < arr.length - 1 && <span className="mx-2 text-primary-foreground/30">|</span>}
-                </span>
+                </li>
               ))}
-            </p>
+            </ul>
           </div>
         ))}
-      </div>
-
-      {/* Most Popular Treatment Costs */}
-      <div className="mt-6">
-        <h4 className="font-semibold text-sm mb-3">Most Popular Treatment Costs</h4>
-        <p className="text-sm text-primary-foreground/60 leading-relaxed">
-          {["IVF Cost Estimate", "IUI Cost Estimate", "Hysterectomy Cost Estimate", "Fibroid Surgery Cost Estimate", "C-Section Cost Estimate", "Laparoscopic Surgery Cost Estimate", "Ovarian Cyst Removal Cost Estimate", "Endometriosis Treatment Cost Estimate"].map((t, i, arr) => (
-            <span key={t}>
-              <a href="#packages" className="hover:text-primary-foreground transition-colors">{t}</a>
-              {i < arr.length - 1 && <span className="mx-2 text-primary-foreground/30">|</span>}
-            </span>
-          ))}
-        </p>
       </div>
 
       <div className="border-t border-primary-foreground/10 mt-6 pt-6 text-center text-xs text-primary-foreground/40">
