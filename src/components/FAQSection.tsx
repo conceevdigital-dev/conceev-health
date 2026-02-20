@@ -29,7 +29,7 @@ const countryCodes = [
 ];
 
 const FAQSection = () => {
-  const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", surgery: "", query: "" });
+  const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", surgery: "", location: "", query: "" });
   const [countryIdx, setCountryIdx] = useState(0);
   const [agreed, setAgreed] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ const FAQSection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.firstName.trim() || !form.phone.trim() || !form.surgery) {
+    if (!form.firstName.trim() || !form.phone.trim() || !form.surgery || !form.location) {
       toast({ title: "Please fill all required fields", variant: "destructive" });
       return;
     }
@@ -55,7 +55,7 @@ const FAQSection = () => {
       name: `${form.firstName.trim()} ${form.lastName.trim()}`.trim().slice(0, 100),
       phone: `${selectedCountry.code}${form.phone.trim()}`.slice(0, 15),
       procedure_interest: form.surgery,
-      city: "Not specified",
+      city: form.location,
       source_page: "faq_contact_form",
     });
     setLoading(false);
@@ -63,7 +63,7 @@ const FAQSection = () => {
       toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
     } else {
       toast({ title: "Thank you! 🎉", description: "Our care coordinator will contact you shortly." });
-      setForm({ firstName: "", lastName: "", phone: "", surgery: "", query: "" });
+      setForm({ firstName: "", lastName: "", phone: "", surgery: "", location: "", query: "" });
     }
   };
 
@@ -144,6 +144,15 @@ const FAQSection = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {surgeries.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={form.location} onValueChange={(v) => setForm({ ...form, location: v })}>
+                  <SelectTrigger className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground text-sm h-9">
+                    <SelectValue placeholder="Preferred Location *" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Bangalore">Bangalore</SelectItem>
+                    <SelectItem value="Hyderabad">Hyderabad</SelectItem>
                   </SelectContent>
                 </Select>
                 <Textarea
