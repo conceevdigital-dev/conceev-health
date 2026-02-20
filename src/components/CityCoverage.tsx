@@ -98,7 +98,7 @@ const CityCoverage = () => {
         </p>
 
         {/* City tabs */}
-        <div className="flex flex-col sm:flex-row gap-0 max-w-5xl mx-auto">
+        <div className="flex flex-col sm:flex-row gap-0">
           {cities.map((c) => (
             <button
               key={c.city}
@@ -137,7 +137,7 @@ const CityCoverage = () => {
             return (
               <div
                 key={c.city}
-                className="bg-card rounded-b-2xl border border-t-0 border-border p-6 max-w-5xl mx-auto shadow-sm"
+                className="bg-card rounded-b-2xl border border-t-0 border-border p-6 shadow-sm"
               >
                 {/* Area chips */}
                 <div className="flex flex-wrap gap-2 mb-4 overflow-x-auto pb-1">
