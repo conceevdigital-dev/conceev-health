@@ -44,17 +44,27 @@ const Footer = () => (
         </div>
       </div>
 
-      {/* Most Popular Treatments */}
-      <div className="border-t border-primary-foreground/10 mt-8 pt-6">
-        <h4 className="font-semibold text-sm mb-3">Our Most Popular Treatments</h4>
-        <p className="text-sm text-primary-foreground/60 leading-relaxed">
-          {["IVF Treatment", "IUI Treatment", "Hysterectomy", "Fibroid Surgery", "Ovarian Cyst Removal", "C-Section Delivery", "Normal Delivery", "Laparoscopic Surgery", "Endometriosis Treatment", "PCOS Management"].map((t, i, arr) => (
-            <span key={t}>
-              <a href="#specialties" className="hover:text-primary-foreground transition-colors">{t}</a>
-              {i < arr.length - 1 && <span className="mx-2 text-primary-foreground/30">|</span>}
-            </span>
-          ))}
-        </p>
+      {/* Most Popular Treatments by Specialty */}
+      <div className="border-t border-primary-foreground/10 mt-8 pt-6 space-y-5">
+        <h4 className="font-semibold text-sm">Our Most Popular Treatments</h4>
+
+        {[
+          { specialty: "Gynaecology", treatments: ["Hysterectomy", "Fibroid Surgery", "Ovarian Cyst Removal", "Laparoscopic Surgery", "Endometriosis Treatment", "PCOS Management", "Uterine Prolapse Surgery"] },
+          { specialty: "Maternity", treatments: ["Normal Delivery", "C-Section Delivery", "High-Risk Pregnancy Care", "Prenatal Screening", "Postpartum Care"] },
+          { specialty: "Fertility", treatments: ["IVF Treatment", "IUI Treatment", "Egg Freezing", "ICSI Treatment", "Fertility Assessment", "Male Infertility Treatment"] },
+        ].map((s) => (
+          <div key={s.specialty}>
+            <h5 className="text-xs font-semibold text-primary-foreground/80 mb-1.5">{s.specialty}</h5>
+            <p className="text-sm text-primary-foreground/60 leading-relaxed">
+              {s.treatments.map((t, i, arr) => (
+                <span key={t}>
+                  <a href="#specialties" className="hover:text-primary-foreground transition-colors">{t}</a>
+                  {i < arr.length - 1 && <span className="mx-2 text-primary-foreground/30">|</span>}
+                </span>
+              ))}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* Most Popular Treatment Costs */}
