@@ -21,9 +21,9 @@ const Index = () => (
     <Navbar />
     <main>
       <HeroSection />
+      <TrustMetrics />
       <WhyChooseUs />
       <SpecialtiesGrid />
-      <TrustMetrics />
       <PartnersAndDoctors />
       <FutureBanner />
       <PromoCards />
