@@ -14,6 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
+      cities: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      doctor_reviews: {
+        Row: {
+          area: string
+          created_at: string
+          doctor_id: string
+          id: string
+          image_url: string | null
+          name: string
+          quote: string
+          rating: number
+        }
+        Insert: {
+          area: string
+          created_at?: string
+          doctor_id: string
+          id?: string
+          image_url?: string | null
+          name: string
+          quote: string
+          rating?: number
+        }
+        Update: {
+          area?: string
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          quote?: string
+          rating?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_reviews_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctors: {
+        Row: {
+          bio: string
+          cities: string[]
+          consultation_fee: string
+          created_at: string
+          designation: string
+          experience: string
+          hospitals: string[]
+          id: string
+          image_url: string | null
+          languages: string[]
+          name: string
+          qualifications: string[]
+          slug: string
+          specializations: string[]
+          surgeries: string[]
+        }
+        Insert: {
+          bio?: string
+          cities?: string[]
+          consultation_fee?: string
+          created_at?: string
+          designation: string
+          experience: string
+          hospitals?: string[]
+          id?: string
+          image_url?: string | null
+          languages?: string[]
+          name: string
+          qualifications?: string[]
+          slug: string
+          specializations?: string[]
+          surgeries?: string[]
+        }
+        Update: {
+          bio?: string
+          cities?: string[]
+          consultation_fee?: string
+          created_at?: string
+          designation?: string
+          experience?: string
+          hospitals?: string[]
+          id?: string
+          image_url?: string | null
+          languages?: string[]
+          name?: string
+          qualifications?: string[]
+          slug?: string
+          specializations?: string[]
+          surgeries?: string[]
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           city: string
@@ -44,15 +160,204 @@ export type Database = {
         }
         Relationships: []
       }
+      locations: {
+        Row: {
+          area: string
+          city_id: string
+          created_at: string
+          id: string
+          name: string
+          surgeries: string[]
+        }
+        Insert: {
+          area: string
+          city_id: string
+          created_at?: string
+          id?: string
+          name: string
+          surgeries?: string[]
+        }
+        Update: {
+          area?: string
+          city_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          surgeries?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "locations_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      package_reviews: {
+        Row: {
+          city: string
+          created_at: string
+          id: string
+          name: string
+          package_id: string
+          rating: number
+          text: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          id?: string
+          name: string
+          package_id: string
+          rating?: number
+          text: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          id?: string
+          name?: string
+          package_id?: string
+          rating?: number
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_reviews_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      packages: {
+        Row: {
+          avg_rating: number
+          cities: string[]
+          created_at: string
+          description: string
+          duration: string | null
+          icon_name: string
+          id: string
+          includes: string[]
+          overview: string | null
+          price: string
+          recovery: string | null
+          slug: string
+          specialty_id: string | null
+          success_rate: string | null
+          tag: string | null
+          title: string
+          total_patients: string | null
+        }
+        Insert: {
+          avg_rating?: number
+          cities?: string[]
+          created_at?: string
+          description?: string
+          duration?: string | null
+          icon_name?: string
+          id?: string
+          includes?: string[]
+          overview?: string | null
+          price: string
+          recovery?: string | null
+          slug: string
+          specialty_id?: string | null
+          success_rate?: string | null
+          tag?: string | null
+          title: string
+          total_patients?: string | null
+        }
+        Update: {
+          avg_rating?: number
+          cities?: string[]
+          created_at?: string
+          description?: string
+          duration?: string | null
+          icon_name?: string
+          id?: string
+          includes?: string[]
+          overview?: string | null
+          price?: string
+          recovery?: string | null
+          slug?: string
+          specialty_id?: string | null
+          success_rate?: string | null
+          tag?: string | null
+          title?: string
+          total_patients?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packages_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "specialties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      specialties: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -179,6 +484,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
