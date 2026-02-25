@@ -21,6 +21,7 @@ import AdminDoctors from "./pages/admin/AdminDoctors";
 import AdminLocations from "./pages/admin/AdminLocations";
 import AdminSpecialties from "./pages/admin/AdminSpecialties";
 import AdminLeads from "./pages/admin/AdminLeads";
+import AdminUsers from "./pages/admin/AdminUsers";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="locations" element={<AdminLocations />} />
             <Route path="specialties" element={<AdminSpecialties />} />
             <Route path="leads" element={<AdminLeads />} />
+            <Route path="users" element={<AdminUsers />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
