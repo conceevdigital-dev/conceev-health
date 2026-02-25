@@ -1,49 +1,51 @@
 
 
-## Diagnosis
+## Problem
 
-I verified the backend database thoroughly:
+The Lovable preview environment patches `window.fetch` (via `lovable.js`), which blocks ALL fetch requests -- including our edge function fallback. Both the direct Supabase auth call and the edge function call fail with "Failed to fetch" because they both go through `window.fetch`.
 
-- **User exists**: `admin@conceev.com` (ID: `31c26655-f613-4040-9af4-85774b5a1a6b`, email confirmed, last sign-in recorded)
-- **Admin role exists**: The `user_roles` table has an entry with `role: admin` for this user
-- **Auth logs show success**: The backend auth service returns HTTP 200 for login requests that reach it
+Evidence from console logs:
+- Direct auth: `TypeError: Failed to fetch` at `window.fetch (lovable.js:1:2838)`
+- Edge function fallback: `TypeError: Failed to fetch` at `window.fetch (lovable.js:1:2838)`
+- Edge function logs: **Empty** -- the request never reaches the server
 
-The problem is that **requests never reach the backend**. Every single auth request from your browser fails with "Failed to fetch" before it even hits the server. The retry mechanism we added retries 3 times, but all 3 attempts fail identically because the underlying `fetch()` call is being blocked/intercepted in the preview environment.
+## Solution
 
-## Root Cause
+Replace `fetch()` with `XMLHttpRequest` in the edge function login call. The `lovable.js` interceptor only patches `window.fetch`, not `XMLHttpRequest`.
 
-The Supabase JS client uses `window.fetch()` internally for all auth requests. The preview environment intercepts `window.fetch()`, and this interception is consistently blocking the auth endpoint. Retrying the same blocked call will never work.
+## Changes
 
-## Solution: Create a backend login function
+**File: `src/pages/admin/AdminLogin.tsx`**
 
-Instead of relying on the client-side `fetch()` (which is intercepted), we will create a **backend function** that handles authentication server-side, then returns the session tokens to the client. The client calls this function via a simple POST -- which goes through a different code path that works reliably.
+Replace the `loginViaEdgeFunction` function to use `XMLHttpRequest` instead of `fetch`:
 
-### Changes
+```typescript
+const loginViaEdgeFunction = async (): Promise<{ access_token: string; refresh_token: string } | null> => {
+  return new Promise((resolve, reject) => {
+    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    const url = `https://${projectId}.supabase.co/functions/v1/admin-login`;
 
-1. **Create `supabase/functions/admin-login/index.ts`** -- A backend function that:
-   - Receives email/password via POST body
-   - Calls the auth API server-side (no fetch interception)
-   - Returns the session data (access_token, refresh_token) to the client
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("apikey", anonKey);
 
-2. **Update `src/pages/admin/AdminLogin.tsx`** -- Change `handleLogin` to:
-   - First try the normal `supabase.auth.signInWithPassword()` approach
-   - If it fails with "Failed to fetch", fall back to calling the backend function
-   - Use `supabase.auth.setSession()` with the returned tokens to establish the session client-side
-   - Then proceed with the existing admin role check
+    xhr.onload = () => {
+      const data = JSON.parse(xhr.responseText);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(data);
+      } else {
+        reject(new Error(data.error || "Login failed"));
+      }
+    };
 
-### Technical detail
+    xhr.onerror = () => reject(new Error("Network error"));
 
-```text
-Current (broken) flow:
-  Browser → window.fetch() [intercepted] → ❌ "Failed to fetch"
-
-New flow (fallback):
-  Browser → POST /functions/v1/admin-login → Backend function
-    → Server-side auth call (no interception) → ✅ Returns tokens
-  Browser → supabase.auth.setSession(tokens) → ✅ Logged in
+    xhr.send(JSON.stringify({ email, password }));
+  });
+};
 ```
 
-### Files to create/modify
-- **Create**: `supabase/functions/admin-login/index.ts`
-- **Modify**: `src/pages/admin/AdminLogin.tsx` -- add fallback to edge function when direct auth fails
+Also update the error handling in `handleLogin` to **always** try the edge function fallback when direct auth fails (not just on network errors), since the interceptor will always cause failures in the preview.
 
