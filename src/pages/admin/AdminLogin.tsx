@@ -14,11 +14,28 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const attemptLogin = async (retries = 3): Promise<{ error: any }> => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const result = await supabase.auth.signInWithPassword({ email, password });
+        return result;
+      } catch (err: any) {
+        const msg = err?.message || String(err);
+        if (msg.includes("Failed to fetch") && i < retries - 1) {
+          await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
+          continue;
+        }
+        return { error: { message: msg } };
+      }
+    }
+    return { error: { message: "Login failed after multiple attempts. Please try again." } };
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await attemptLogin();
 
     if (error) {
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
