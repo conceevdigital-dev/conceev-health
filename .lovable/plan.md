@@ -2,46 +2,48 @@
 
 ## Diagnosis
 
-The admin credentials (`admin@conceev.com` / `Admin@123456`) are **verified working**. I just tested them successfully and the dashboard loaded correctly with all data.
+I verified the backend database thoroughly:
 
-The "Failed to fetch" error you're experiencing is caused by the **Lovable preview iframe's fetch interceptor** -- a script (`lovable.js`) that wraps `window.fetch` inside the preview panel. This wrapper sometimes blocks authentication requests to the backend.
+- **User exists**: `admin@conceev.com` (ID: `31c26655-f613-4040-9af4-85774b5a1a6b`, email confirmed, last sign-in recorded)
+- **Admin role exists**: The `user_roles` table has an entry with `role: admin` for this user
+- **Auth logs show success**: The backend auth service returns HTTP 200 for login requests that reach it
+
+The problem is that **requests never reach the backend**. Every single auth request from your browser fails with "Failed to fetch" before it even hits the server. The retry mechanism we added retries 3 times, but all 3 attempts fail identically because the underlying `fetch()` call is being blocked/intercepted in the preview environment.
 
 ## Root Cause
 
-The preview environment at `728b6476-a908-46c1-9ce2-cca684cd9728.lovableproject.com` injects a script that intercepts all `fetch()` calls. When the login form calls the authentication API, this interceptor occasionally fails silently, producing a "Failed to fetch" error before the request even reaches the server.
+The Supabase JS client uses `window.fetch()` internally for all auth requests. The preview environment intercepts `window.fetch()`, and this interception is consistently blocking the auth endpoint. Retrying the same blocked call will never work.
 
-This is **not** a code bug or a credentials issue -- it is a preview environment limitation.
+## Solution: Create a backend login function
 
-## Solution
+Instead of relying on the client-side `fetch()` (which is intercepted), we will create a **backend function** that handles authentication server-side, then returns the session tokens to the client. The client calls this function via a simple POST -- which goes through a different code path that works reliably.
 
-To fix this so login works reliably in **both** the preview iframe and the published site, I will update the `AdminLogin` component to use the native `fetch` directly for the authentication call, bypassing the preview wrapper. Specifically:
+### Changes
 
-1. **Update `AdminLogin.tsx`** to store a reference to the original `window.fetch` before the Lovable script overrides it, or use `XMLHttpRequest` as a fallback for the auth token request
-2. A simpler alternative: add error handling that detects the "Failed to fetch" error and automatically retries the request after a short delay
+1. **Create `supabase/functions/admin-login/index.ts`** -- A backend function that:
+   - Receives email/password via POST body
+   - Calls the auth API server-side (no fetch interception)
+   - Returns the session data (access_token, refresh_token) to the client
 
-### Recommended approach: Direct fetch bypass
-
-Modify the `handleLogin` function in `AdminLogin.tsx` to:
-- Catch "Failed to fetch" errors specifically
-- On that error, make the auth request directly using `XMLHttpRequest` or a stored reference to the native fetch
-- This ensures the login works in both preview and published environments
-
-### Files to modify
-- `src/pages/admin/AdminLogin.tsx` -- add retry logic with native fetch fallback
+2. **Update `src/pages/admin/AdminLogin.tsx`** -- Change `handleLogin` to:
+   - First try the normal `supabase.auth.signInWithPassword()` approach
+   - If it fails with "Failed to fetch", fall back to calling the backend function
+   - Use `supabase.auth.setSession()` with the returned tokens to establish the session client-side
+   - Then proceed with the existing admin role check
 
 ### Technical detail
-```text
-Current flow:
-  User clicks Sign In
-    → supabase.auth.signInWithPassword()
-      → window.fetch() [intercepted by lovable.js]
-        → ❌ "Failed to fetch"
 
-Fixed flow:
-  User clicks Sign In
-    → supabase.auth.signInWithPassword()
-      → window.fetch() [intercepted by lovable.js]
-        → If "Failed to fetch", retry with native fetch
-          → ✅ Success
+```text
+Current (broken) flow:
+  Browser → window.fetch() [intercepted] → ❌ "Failed to fetch"
+
+New flow (fallback):
+  Browser → POST /functions/v1/admin-login → Backend function
+    → Server-side auth call (no interception) → ✅ Returns tokens
+  Browser → supabase.auth.setSession(tokens) → ✅ Logged in
 ```
+
+### Files to create/modify
+- **Create**: `supabase/functions/admin-login/index.ts`
+- **Modify**: `src/pages/admin/AdminLogin.tsx` -- add fallback to edge function when direct auth fails
 
