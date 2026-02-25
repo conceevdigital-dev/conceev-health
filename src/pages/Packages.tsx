@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LeadFormModal from "@/components/LeadFormModal";
-import { specialties, allPackages } from "@/data/packages";
+import { useSpecialties } from "@/hooks/useSpecialties";
+import { usePackages } from "@/hooks/usePackages";
+import { getIconByName } from "@/lib/icons";
 
 const cityOptions = ["All Cities", "Bangalore", "Hyderabad"] as const;
 
@@ -14,8 +16,12 @@ const Packages = () => {
   const [cityFilter, setCityFilter] = useState<string>("All Cities");
   const [formOpen, setFormOpen] = useState(false);
 
+  const { data: specialties = [] } = useSpecialties();
+  const { data: allPackages = [] } = usePackages();
+
+  const currentSpecialty = specialties[activeTab];
   const filtered = allPackages
-    .filter((p) => p.specialty === specialties[activeTab])
+    .filter((p) => p.specialty_id === currentSpecialty?.id)
     .filter((p) => cityFilter === "All Cities" || p.cities.includes(cityFilter));
 
   return (
@@ -37,12 +43,11 @@ const Packages = () => {
       {/* Tabs + Packages */}
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
-          {/* Specialty Tabs + City Filter */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {specialties.map((label, i) => (
+              {specialties.map((s, i) => (
                 <button
-                  key={label}
+                  key={s.id}
                   onClick={() => setActiveTab(i)}
                   className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
                     activeTab === i
@@ -50,7 +55,7 @@ const Packages = () => {
                       : "bg-card border border-border text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {label}
+                  {s.name}
                 </button>
               ))}
             </div>
@@ -72,40 +77,42 @@ const Packages = () => {
             </div>
           </div>
 
-          {/* Cards */}
           {filtered.length === 0 ? (
             <p className="text-center text-muted-foreground py-12">
               No packages available for this combination. Try a different city or specialty.
             </p>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {filtered.map((pkg) => (
-                <div
-                  key={pkg.slug}
-                  className="bg-card rounded-2xl border border-border p-6 hover:shadow-lg transition-all duration-300 relative flex flex-col"
-                >
-                  {pkg.tag && (
-                    <span className="absolute top-4 right-4 text-xs font-semibold bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full">
-                      {pkg.tag}
-                    </span>
-                  )}
-                  <pkg.icon className="h-9 w-9 text-primary mb-3" />
-                  <h3 className="font-serif text-lg font-bold text-foreground mb-1">{pkg.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-3 flex-1">{pkg.desc}</p>
-                  <p className="text-xl font-bold text-foreground mb-1">
-                    Starting at <span className="text-primary">{pkg.price}</span>
-                  </p>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground mb-4">
-                    <MapPin className="h-3 w-3" />
-                    {pkg.cities.join(" · ")}
+              {filtered.map((pkg) => {
+                const Icon = getIconByName(pkg.icon_name);
+                return (
+                  <div
+                    key={pkg.slug}
+                    className="bg-card rounded-2xl border border-border p-6 hover:shadow-lg transition-all duration-300 relative flex flex-col"
+                  >
+                    {pkg.tag && (
+                      <span className="absolute top-4 right-4 text-xs font-semibold bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full">
+                        {pkg.tag}
+                      </span>
+                    )}
+                    <Icon className="h-9 w-9 text-primary mb-3" />
+                    <h3 className="font-serif text-lg font-bold text-foreground mb-1">{pkg.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-3 flex-1">{pkg.description}</p>
+                    <p className="text-xl font-bold text-foreground mb-1">
+                      Starting at <span className="text-primary">{pkg.price}</span>
+                    </p>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-4">
+                      <MapPin className="h-3 w-3" />
+                      {pkg.cities.join(" · ")}
+                    </div>
+                    <Link to={`/packages/${pkg.slug}`}>
+                      <Button className="w-full rounded-full gap-1.5">
+                        View Package Details <ArrowRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
                   </div>
-                  <Link to={`/packages/${pkg.slug}`}>
-                    <Button className="w-full rounded-full gap-1.5">
-                      View Package Details <ArrowRight className="h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

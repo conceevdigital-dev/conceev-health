@@ -1,84 +1,40 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { MapPin, ArrowRight, Building2, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const cities = [
-  {
-    city: "Bangalore",
-    count: "6+ Clinics",
-    areas: ["Whitefield", "HSR Layout", "Electronic City", "Koramangala", "Marathahalli", "Jayanagar"],
-    hospitals: [
-      { name: "Apollo Hospital", area: "Whitefield", city: "Bangalore", surgeries: ["Hysterectomy", "IVF", "Fibroid Removal"] },
-      { name: "Sakra World Hospital", area: "Whitefield", city: "Bangalore", surgeries: ["Laparoscopy", "C-Section", "Ovarian Cyst"] },
-      { name: "Narayana Health", area: "Whitefield", city: "Bangalore", surgeries: ["IVF", "Hysterectomy", "Endometriosis"] },
-      { name: "Cloudnine Hospital", area: "Whitefield", city: "Bangalore", surgeries: ["C-Section", "Fertility Care", "PCOS Treatment"] },
-      { name: "Manipal Hospital", area: "HSR Layout", city: "Bangalore", surgeries: ["Hysterectomy", "Fibroid Removal", "IVF"] },
-      { name: "Motherhood Hospital", area: "HSR Layout", city: "Bangalore", surgeries: ["C-Section", "Laparoscopy", "PCOS Treatment"] },
-      { name: "Aster CMI Hospital", area: "HSR Layout", city: "Bangalore", surgeries: ["Ovarian Cyst", "Endometriosis", "IVF"] },
-      { name: "Fortis Hospital", area: "HSR Layout", city: "Bangalore", surgeries: ["Hysterectomy", "Fibroid Removal", "Fertility Care"] },
-      { name: "BGS Gleneagles Hospital", area: "Electronic City", city: "Bangalore", surgeries: ["IVF", "C-Section", "Laparoscopy"] },
-      { name: "Sparsh Hospital", area: "Electronic City", city: "Bangalore", surgeries: ["Hysterectomy", "Endometriosis", "PCOS Treatment"] },
-      { name: "Narayana Multispeciality", area: "Electronic City", city: "Bangalore", surgeries: ["Fibroid Removal", "Ovarian Cyst", "IVF"] },
-      { name: "Sakra Women's Centre", area: "Electronic City", city: "Bangalore", surgeries: ["Fertility Care", "C-Section", "Laparoscopy"] },
-      { name: "Rainbow Hospital", area: "Koramangala", city: "Bangalore", surgeries: ["C-Section", "IVF", "PCOS Treatment"] },
-      { name: "Apollo Cradle", area: "Koramangala", city: "Bangalore", surgeries: ["Laparoscopy", "Fibroid Removal", "Fertility Care"] },
-      { name: "Vikram Hospital", area: "Koramangala", city: "Bangalore", surgeries: ["Hysterectomy", "Endometriosis", "Ovarian Cyst"] },
-      { name: "Cloudnine Koramangala", area: "Koramangala", city: "Bangalore", surgeries: ["C-Section", "IVF", "PCOS Treatment"] },
-      { name: "Columbia Asia", area: "Marathahalli", city: "Bangalore", surgeries: ["Hysterectomy", "IVF", "Laparoscopy"] },
-      { name: "Manipal Marathahalli", area: "Marathahalli", city: "Bangalore", surgeries: ["Fibroid Removal", "C-Section", "PCOS Treatment"] },
-      { name: "Motherhood Marathahalli", area: "Marathahalli", city: "Bangalore", surgeries: ["Fertility Care", "Endometriosis", "IVF"] },
-      { name: "Aster Marathahalli", area: "Marathahalli", city: "Bangalore", surgeries: ["Ovarian Cyst", "Hysterectomy", "C-Section"] },
-      { name: "Fortis Jayanagar", area: "Jayanagar", city: "Bangalore", surgeries: ["IVF", "Laparoscopy", "Fibroid Removal"] },
-      { name: "Apollo Jayanagar", area: "Jayanagar", city: "Bangalore", surgeries: ["Hysterectomy", "C-Section", "Endometriosis"] },
-      { name: "Sagar Hospital", area: "Jayanagar", city: "Bangalore", surgeries: ["PCOS Treatment", "Ovarian Cyst", "Fertility Care"] },
-      { name: "Narayana Jayanagar", area: "Jayanagar", city: "Bangalore", surgeries: ["IVF", "Fibroid Removal", "Laparoscopy"] },
-    ],
-  },
-  {
-    city: "Hyderabad",
-    count: "6+ Clinics",
-    areas: ["Kukatpally", "Madhapur", "Gachibowli", "Kondapur", "Secunderabad", "Banjara Hills"],
-    hospitals: [
-      { name: "Apollo Hospital", area: "Kukatpally", city: "Hyderabad", surgeries: ["IVF", "Hysterectomy", "C-Section"] },
-      { name: "KIMS Hospital", area: "Kukatpally", city: "Hyderabad", surgeries: ["Laparoscopy", "Fibroid Removal", "PCOS Treatment"] },
-      { name: "Rainbow Hospital", area: "Kukatpally", city: "Hyderabad", surgeries: ["C-Section", "Fertility Care", "Endometriosis"] },
-      { name: "Sunshine Hospital", area: "Kukatpally", city: "Hyderabad", surgeries: ["Ovarian Cyst", "IVF", "Hysterectomy"] },
-      { name: "Yashoda Hospital", area: "Madhapur", city: "Hyderabad", surgeries: ["Hysterectomy", "IVF", "Laparoscopy"] },
-      { name: "Care Hospital", area: "Madhapur", city: "Hyderabad", surgeries: ["C-Section", "Fibroid Removal", "PCOS Treatment"] },
-      { name: "AIG Hospital", area: "Madhapur", city: "Hyderabad", surgeries: ["Fertility Care", "Endometriosis", "IVF"] },
-      { name: "Continental Hospital", area: "Madhapur", city: "Hyderabad", surgeries: ["Ovarian Cyst", "Hysterectomy", "C-Section"] },
-      { name: "Continental Hospital", area: "Gachibowli", city: "Hyderabad", surgeries: ["IVF", "Hysterectomy", "Laparoscopy"] },
-      { name: "AIG Gachibowli", area: "Gachibowli", city: "Hyderabad", surgeries: ["C-Section", "Fibroid Removal", "Fertility Care"] },
-      { name: "Citizens Hospital", area: "Gachibowli", city: "Hyderabad", surgeries: ["PCOS Treatment", "Endometriosis", "IVF"] },
-      { name: "Medicover Hospital", area: "Gachibowli", city: "Hyderabad", surgeries: ["Ovarian Cyst", "Hysterectomy", "C-Section"] },
-      { name: "Care Hospital Kondapur", area: "Kondapur", city: "Hyderabad", surgeries: ["IVF", "Laparoscopy", "Fibroid Removal"] },
-      { name: "Sunshine Kondapur", area: "Kondapur", city: "Hyderabad", surgeries: ["C-Section", "Hysterectomy", "PCOS Treatment"] },
-      { name: "Medicover Kondapur", area: "Kondapur", city: "Hyderabad", surgeries: ["Fertility Care", "Endometriosis", "Ovarian Cyst"] },
-      { name: "Rainbow Kondapur", area: "Kondapur", city: "Hyderabad", surgeries: ["IVF", "C-Section", "Laparoscopy"] },
-      { name: "KIMS Secunderabad", area: "Secunderabad", city: "Hyderabad", surgeries: ["Hysterectomy", "IVF", "Fibroid Removal"] },
-      { name: "Yashoda Secunderabad", area: "Secunderabad", city: "Hyderabad", surgeries: ["C-Section", "Laparoscopy", "PCOS Treatment"] },
-      { name: "Apollo Secunderabad", area: "Secunderabad", city: "Hyderabad", surgeries: ["Fertility Care", "Endometriosis", "IVF"] },
-      { name: "Care Secunderabad", area: "Secunderabad", city: "Hyderabad", surgeries: ["Ovarian Cyst", "Hysterectomy", "C-Section"] },
-      { name: "Apollo Banjara Hills", area: "Banjara Hills", city: "Hyderabad", surgeries: ["IVF", "Hysterectomy", "Laparoscopy"] },
-      { name: "KIMS Banjara Hills", area: "Banjara Hills", city: "Hyderabad", surgeries: ["C-Section", "Fibroid Removal", "Fertility Care"] },
-      { name: "Care Banjara Hills", area: "Banjara Hills", city: "Hyderabad", surgeries: ["PCOS Treatment", "Endometriosis", "IVF"] },
-      { name: "Medicover Banjara Hills", area: "Banjara Hills", city: "Hyderabad", surgeries: ["Ovarian Cyst", "Hysterectomy", "C-Section"] },
-    ],
-  },
-];
+import { useCities } from "@/hooks/useLocations";
+import { useLocations } from "@/hooks/useLocations";
 
 const CityCoverage = () => {
-  const [activeCity, setActiveCity] = useState("Bangalore");
-  const [selectedArea, setSelectedArea] = useState<Record<string, string>>({
-    Bangalore: "Whitefield",
-  });
+  const { data: cities = [] } = useCities();
+  const { data: locations = [] } = useLocations();
+  const [activeCity, setActiveCity] = useState<string>("");
+  const [selectedArea, setSelectedArea] = useState<Record<string, string>>({});
   const [scrollIndex, setScrollIndex] = useState(0);
+
+  // Set default active city once loaded
+  const activeCityName = activeCity || cities[0]?.name || "";
+
+  const cityData = useMemo(() => {
+    return cities.map((c) => {
+      const cityLocations = locations.filter((l) => l.city_id === c.id);
+      const areas = [...new Set(cityLocations.map((l) => l.area))].sort();
+      return {
+        ...c,
+        count: `${cityLocations.length}+ Clinics`,
+        areas,
+        hospitals: cityLocations,
+      };
+    });
+  }, [cities, locations]);
 
   const handleCityClick = (city: string) => {
     setActiveCity(city);
     setScrollIndex(0);
     if (!selectedArea[city]) {
-      setSelectedArea((prev) => ({ ...prev, [city]: cities.find((c) => c.city === city)!.areas[0] }));
+      const cd = cityData.find((c) => c.name === city);
+      if (cd && cd.areas.length > 0) {
+        setSelectedArea((prev) => ({ ...prev, [city]: cd.areas[0] }));
+      }
     }
   };
 
@@ -86,6 +42,8 @@ const CityCoverage = () => {
     setSelectedArea((prev) => ({ ...prev, [city]: area }));
     setScrollIndex(0);
   };
+
+  if (cities.length === 0) return null;
 
   return (
     <section id="cities" className="py-16 md:py-20 bg-secondary/50">
@@ -99,25 +57,25 @@ const CityCoverage = () => {
 
         {/* City tabs */}
         <div className="flex flex-col sm:flex-row gap-0">
-          {cities.map((c) => (
+          {cityData.map((c) => (
             <button
-              key={c.city}
-              onClick={() => handleCityClick(c.city)}
+              key={c.id}
+              onClick={() => handleCityClick(c.name)}
               className={`flex-1 flex items-center justify-between px-4 sm:px-6 py-4 border transition-all cursor-pointer ${
-                activeCity === c.city
+                activeCityName === c.name
                   ? "bg-card border-border border-b-card rounded-t-2xl shadow-sm z-10"
                   : "bg-secondary/80 border-transparent hover:bg-secondary rounded-t-2xl"
               }`}
             >
               <div className="flex items-center gap-3">
                 <h3 className="font-serif text-base sm:text-lg font-bold flex items-center gap-2 text-foreground">
-                  <MapPin className="h-5 w-5 text-primary" /> {c.city}
+                  <MapPin className="h-5 w-5 text-primary" /> {c.name}
                 </h3>
                 <span className="text-xs font-medium bg-primary/10 text-primary px-3 py-1 rounded-full">
                   {c.count}
                 </span>
               </div>
-              {activeCity === c.city ? (
+              {activeCityName === c.name ? (
                 <ChevronUp className="h-5 w-5 text-muted-foreground" />
               ) : (
                 <ChevronDown className="h-5 w-5 text-muted-foreground" />
@@ -127,24 +85,21 @@ const CityCoverage = () => {
         </div>
 
         {/* Active city content */}
-        {cities
-          .filter((c) => c.city === activeCity)
+        {cityData
+          .filter((c) => c.name === activeCityName)
           .map((c) => {
-            const activeArea = selectedArea[c.city] || "";
+            const activeArea = selectedArea[c.name] || c.areas[0] || "";
             const filteredHospitals = c.hospitals.filter((h) => h.area === activeArea);
             const maxScroll = Math.max(0, filteredHospitals.length - 2);
 
             return (
-              <div
-                key={c.city}
-                className="bg-card rounded-b-2xl border border-t-0 border-border p-6 shadow-sm"
-              >
+              <div key={c.id} className="bg-card rounded-b-2xl border border-t-0 border-border p-6 shadow-sm">
                 {/* Area chips */}
                 <div className="flex flex-wrap gap-2 mb-4 overflow-x-auto pb-1">
                   {c.areas.map((a) => (
                     <button
                       key={a}
-                      onClick={() => handleAreaClick(c.city, a)}
+                      onClick={() => handleAreaClick(c.name, a)}
                       className={`text-sm px-3.5 py-1.5 rounded-full transition-all cursor-pointer font-medium whitespace-nowrap shrink-0 ${
                         activeArea === a
                           ? "bg-primary text-primary-foreground shadow-sm"
@@ -207,7 +162,7 @@ const CityCoverage = () => {
                               <div>
                                 <p className="text-sm font-bold text-foreground leading-tight">{h.name}</p>
                                 <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                                  <MapPin className="h-3 w-3" /> {h.area}, {h.city}
+                                  <MapPin className="h-3 w-3" /> {h.area}, {h.city_name}
                                 </p>
                               </div>
                             </div>
