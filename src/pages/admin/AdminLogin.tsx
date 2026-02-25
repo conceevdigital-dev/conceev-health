@@ -14,68 +14,106 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const attemptLogin = async (maxRetries = 3): Promise<{ data: any; error: any }> => {
-    for (let i = 0; i < maxRetries; i++) {
-      try {
-        const result = await supabase.auth.signInWithPassword({ email, password });
-        // Check if the returned error is a network/fetch error (retryable)
-        if (result.error) {
-          const msg = result.error.message || "";
-          if (msg.includes("Failed to fetch") && i < maxRetries - 1) {
-            console.log(`Login attempt ${i + 1} failed with network error, retrying...`);
-            await new Promise((r) => setTimeout(r, 1500 * (i + 1)));
-            continue;
-          }
-        }
-        return result;
-      } catch (err: any) {
-        const msg = err?.message || String(err);
-        if (msg.includes("Failed to fetch") && i < maxRetries - 1) {
-          console.log(`Login attempt ${i + 1} threw network error, retrying...`);
-          await new Promise((r) => setTimeout(r, 1500 * (i + 1)));
-          continue;
-        }
-        return { data: null, error: { message: msg } };
+  const loginViaEdgeFunction = async (): Promise<{ access_token: string; refresh_token: string } | null> => {
+    try {
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const url = `https://${projectId}.supabase.co/functions/v1/admin-login`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": anonKey,
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Login failed");
       }
+
+      return data;
+    } catch (err: any) {
+      console.error("Edge function login failed:", err);
+      throw err;
     }
-    return { data: null, error: { message: "Login failed after multiple attempts. Please check your network and try again." } };
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await attemptLogin();
+    try {
+      // Try direct auth first
+      let session: any = null;
+      let directError: any = null;
 
-    if (error) {
-      toast({ title: "Login failed", description: error.message, variant: "destructive" });
+      try {
+        const result = await supabase.auth.signInWithPassword({ email, password });
+        if (result.error) {
+          directError = result.error;
+        } else {
+          session = result.data.session;
+        }
+      } catch (err: any) {
+        directError = err;
+      }
+
+      // If direct auth failed with network error, fallback to edge function
+      if (directError) {
+        const msg = directError.message || String(directError);
+        if (msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("fetch")) {
+          console.log("Direct auth failed with network error, trying backend function...");
+          const tokens = await loginViaEdgeFunction();
+          if (tokens) {
+            const { error: setErr } = await supabase.auth.setSession({
+              access_token: tokens.access_token,
+              refresh_token: tokens.refresh_token,
+            });
+            if (setErr) {
+              toast({ title: "Login failed", description: setErr.message, variant: "destructive" });
+              setLoading(false);
+              return;
+            }
+          }
+        } else {
+          // Non-network error (wrong password, etc.)
+          toast({ title: "Login failed", description: msg, variant: "destructive" });
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Check admin role
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({ title: "Login failed", description: "Could not get user", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (!roleData) {
+        await supabase.auth.signOut();
+        toast({ title: "Access denied", description: "You don't have admin privileges.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
+      navigate("/admin");
+    } catch (err: any) {
+      toast({ title: "Login failed", description: err.message || "An unexpected error occurred", variant: "destructive" });
       setLoading(false);
-      return;
     }
-
-    // Check admin role
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast({ title: "Login failed", description: "Could not get user", variant: "destructive" });
-      setLoading(false);
-      return;
-    }
-
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-
-    if (!roleData) {
-      await supabase.auth.signOut();
-      toast({ title: "Access denied", description: "You don't have admin privileges.", variant: "destructive" });
-      setLoading(false);
-      return;
-    }
-
-    navigate("/admin");
   };
 
   return (
