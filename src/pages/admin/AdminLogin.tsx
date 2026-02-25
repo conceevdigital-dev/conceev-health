@@ -16,10 +16,10 @@ const AdminLogin = () => {
 
   const loginViaEdgeFunction = (): Promise<{ access_token: string; refresh_token: string }> => {
     return new Promise((resolve, reject) => {
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
       const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-      const url = `https://${projectId}.supabase.co/functions/v1/admin-login`;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-login`;
 
+      console.log("XHR fallback: calling", url);
       const xhr = new XMLHttpRequest();
       xhr.open("POST", url, true);
       xhr.setRequestHeader("Content-Type", "application/json");
@@ -49,31 +49,39 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      // Always use XHR-based edge function to bypass fetch interceptor
-      console.log("Logging in via backend function (XHR)...");
-      const tokens = await loginViaEdgeFunction();
-      const { error: setErr } = await supabase.auth.setSession({
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-      });
-      if (setErr) {
-        toast({ title: "Login failed", description: setErr.message, variant: "destructive" });
+      let session;
+
+      // Try direct signInWithPassword first (works on published site)
+      try {
+        console.log("Attempting direct sign in...");
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        session = data.session;
+        console.log("Direct sign in succeeded");
+      } catch (directErr: any) {
+        console.log("Direct sign in failed:", directErr.message, "- trying edge function fallback...");
+        // Fallback to XHR edge function (for preview iframe where fetch is intercepted)
+        const tokens = await loginViaEdgeFunction();
+        const { error: setErr } = await supabase.auth.setSession({
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+        });
+        if (setErr) throw setErr;
+        session = (await supabase.auth.getSession()).data.session;
+        console.log("Edge function fallback succeeded");
+      }
+
+      if (!session?.user) {
+        toast({ title: "Login failed", description: "Could not establish session", variant: "destructive" });
         setLoading(false);
         return;
       }
 
       // Check admin role
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({ title: "Login failed", description: "Could not get user", variant: "destructive" });
-        setLoading(false);
-        return;
-      }
-
       const { data: roleData } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", user.id)
+        .eq("user_id", session.user.id)
         .eq("role", "admin")
         .maybeSingle();
 
@@ -86,6 +94,7 @@ const AdminLogin = () => {
 
       navigate("/admin");
     } catch (err: any) {
+      console.error("Login error:", err);
       toast({ title: "Login failed", description: err.message || "An unexpected error occurred", variant: "destructive" });
       setLoading(false);
     }
