@@ -1,32 +1,32 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Clock, CalendarCheck, CheckCircle2, Building2, ArrowRight, Star, Users, TrendingUp, ChevronRight, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LeadFormModal from "@/components/LeadFormModal";
-import { getPackageBySlug, allPackages } from "@/data/packages";
-
-// Reuse hospital data from CityCoverage
-const hospitals = [
-  { name: "Apollo Hospital", area: "Whitefield", city: "Bangalore", surgeries: ["Hysterectomy", "IVF", "Fibroid Removal"] },
-  { name: "Sakra World Hospital", area: "Whitefield", city: "Bangalore", surgeries: ["Laparoscopy", "C-Section", "Ovarian Cyst"] },
-  { name: "Narayana Health", area: "HSR Layout", city: "Bangalore", surgeries: ["IVF", "Hysterectomy", "Endometriosis"] },
-  { name: "Manipal Hospital", area: "HSR Layout", city: "Bangalore", surgeries: ["Hysterectomy", "Fibroid Removal", "IVF"] },
-  { name: "Fortis Hospital", area: "Koramangala", city: "Bangalore", surgeries: ["Hysterectomy", "Fibroid Removal", "Fertility Care"] },
-  { name: "Cloudnine Hospital", area: "Koramangala", city: "Bangalore", surgeries: ["C-Section", "Fertility Care", "PCOS Treatment"] },
-  { name: "Yashoda Hospital", area: "Madhapur", city: "Hyderabad", surgeries: ["Hysterectomy", "IVF", "Laparoscopy"] },
-  { name: "Care Hospital", area: "Madhapur", city: "Hyderabad", surgeries: ["C-Section", "Fibroid Removal", "PCOS Treatment"] },
-  { name: "Apollo Hospital", area: "Banjara Hills", city: "Hyderabad", surgeries: ["IVF", "Hysterectomy", "Laparoscopy"] },
-  { name: "KIMS Hospital", area: "Kukatpally", city: "Hyderabad", surgeries: ["Laparoscopy", "Fibroid Removal", "PCOS Treatment"] },
-  { name: "Rainbow Hospital", area: "Kondapur", city: "Hyderabad", surgeries: ["IVF", "C-Section", "Laparoscopy"] },
-  { name: "Continental Hospital", area: "Gachibowli", city: "Hyderabad", surgeries: ["IVF", "Hysterectomy", "Laparoscopy"] },
-];
+import { usePackageBySlug, usePackages } from "@/hooks/usePackages";
+import { useLocations } from "@/hooks/useLocations";
+import { getIconByName } from "@/lib/icons";
 
 const PackageDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const [formOpen, setFormOpen] = useState(false);
-  const pkg = getPackageBySlug(slug || "");
+  const { data: pkg, isLoading } = usePackageBySlug(slug || "");
+  const { data: allPackages = [] } = usePackages();
+  const { data: locations = [] } = useLocations();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!pkg) {
     return (
@@ -45,9 +45,11 @@ const PackageDetail = () => {
     );
   }
 
-  // Filter hospitals available in the package's cities
-  const availableHospitals = hospitals.filter((h) => pkg.cities.includes(h.city));
-  const relatedPackages = allPackages.filter((p) => p.specialty === pkg.specialty && p.slug !== pkg.slug).slice(0, 3);
+  const Icon = getIconByName(pkg.icon_name);
+  const availableHospitals = locations.filter((h) => pkg.cities.includes(h.city_name || ""));
+  const relatedPackages = allPackages
+    .filter((p) => p.specialty_id === pkg.specialty_id && p.slug !== pkg.slug)
+    .slice(0, 3);
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,7 +58,6 @@ const PackageDetail = () => {
       {/* Hero */}
       <section className="bg-navy text-primary-foreground py-14 md:py-20">
         <div className="container mx-auto px-4">
-          {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-sm text-primary-foreground/50 mb-6" aria-label="Breadcrumb">
             <Link to="/" className="hover:text-primary-foreground transition-colors flex items-center gap-1">
               <Home className="h-3.5 w-3.5" /> Home
@@ -68,7 +69,7 @@ const PackageDetail = () => {
           </nav>
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-2xl bg-primary-foreground/10 flex items-center justify-center shrink-0">
-              <pkg.icon className="h-7 w-7 text-primary-foreground" />
+              <Icon className="h-7 w-7 text-primary-foreground" />
             </div>
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -79,10 +80,10 @@ const PackageDetail = () => {
                   </span>
                 )}
               </div>
-              <p className="text-primary-foreground/70 text-lg mb-4">{pkg.desc}</p>
+              <p className="text-primary-foreground/70 text-lg mb-4">{pkg.description}</p>
               <div className="flex flex-wrap gap-4 text-sm">
-                <span className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-primary-foreground/50" /> {pkg.details.duration}</span>
-                <span className="flex items-center gap-1.5"><CalendarCheck className="h-4 w-4 text-primary-foreground/50" /> Recovery: {pkg.details.recovery}</span>
+                <span className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-primary-foreground/50" /> {pkg.duration}</span>
+                <span className="flex items-center gap-1.5"><CalendarCheck className="h-4 w-4 text-primary-foreground/50" /> Recovery: {pkg.recovery}</span>
                 <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-primary-foreground/50" /> {pkg.cities.join(" & ")}</span>
               </div>
             </div>
@@ -94,19 +95,16 @@ const PackageDetail = () => {
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Main content */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Overview */}
               <div>
                 <h2 className="font-serif text-2xl font-bold text-foreground mb-3">Overview</h2>
-                <p className="text-muted-foreground leading-relaxed">{pkg.details.overview}</p>
+                <p className="text-muted-foreground leading-relaxed">{pkg.overview}</p>
               </div>
 
-              {/* What's included */}
               <div>
                 <h2 className="font-serif text-2xl font-bold text-foreground mb-4">What's Included</h2>
                 <div className="grid sm:grid-cols-2 gap-3">
-                  {pkg.details.includes.map((item) => (
+                  {pkg.includes.map((item) => (
                     <div key={item} className="flex items-center gap-3 bg-card rounded-xl border border-border p-4">
                       <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
                       <span className="text-sm font-medium text-foreground">{item}</span>
@@ -115,7 +113,6 @@ const PackageDetail = () => {
                 </div>
               </div>
 
-              {/* Available Hospitals */}
               <div>
                 <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Available Hospitals</h2>
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -127,13 +124,11 @@ const PackageDetail = () => {
                       <div className="flex-1">
                         <p className="text-sm font-bold text-foreground">{h.name}</p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                          <MapPin className="h-3 w-3" /> {h.area}, {h.city}
+                          <MapPin className="h-3 w-3" /> {h.area}, {h.city_name}
                         </p>
                         <div className="flex flex-wrap gap-1 mt-2">
                           {h.surgeries.map((s) => (
-                            <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium">
-                              {s}
-                            </span>
+                            <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium">{s}</span>
                           ))}
                         </div>
                       </div>
@@ -142,64 +137,59 @@ const PackageDetail = () => {
                 </div>
               </div>
 
-              {/* Success Rate & Stats */}
               <div>
                 <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Success Rate & Stats</h2>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-card rounded-xl border border-border p-5 text-center">
                     <TrendingUp className="h-6 w-6 text-primary mx-auto mb-2" />
-                    <p className="text-2xl font-bold text-foreground">{pkg.successRate}</p>
+                    <p className="text-2xl font-bold text-foreground">{pkg.success_rate || "N/A"}</p>
                     <p className="text-xs text-muted-foreground mt-1">Success Rate</p>
                   </div>
                   <div className="bg-card rounded-xl border border-border p-5 text-center">
                     <Users className="h-6 w-6 text-primary mx-auto mb-2" />
-                    <p className="text-2xl font-bold text-foreground">{pkg.totalPatients}</p>
+                    <p className="text-2xl font-bold text-foreground">{pkg.total_patients || "N/A"}</p>
                     <p className="text-xs text-muted-foreground mt-1">Patients Treated</p>
                   </div>
                   <div className="bg-card rounded-xl border border-border p-5 text-center">
                     <Star className="h-6 w-6 text-primary mx-auto mb-2" />
-                    <p className="text-2xl font-bold text-foreground">{pkg.avgRating}/5</p>
+                    <p className="text-2xl font-bold text-foreground">{pkg.avg_rating}/5</p>
                     <p className="text-xs text-muted-foreground mt-1">Avg Rating</p>
                   </div>
                 </div>
               </div>
 
-              {/* Patient Reviews */}
-              <div>
-                <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Patient Reviews</h2>
-                <div className="space-y-4">
-                  {pkg.reviews.map((review, i) => (
-                    <div key={i} className="bg-card rounded-xl border border-border p-5">
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <p className="text-sm font-bold text-foreground">{review.name}</p>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <MapPin className="h-3 w-3" /> {review.city}
-                          </p>
+              {pkg.reviews && pkg.reviews.length > 0 && (
+                <div>
+                  <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Patient Reviews</h2>
+                  <div className="space-y-4">
+                    {pkg.reviews.map((review) => (
+                      <div key={review.id} className="bg-card rounded-xl border border-border p-5">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <p className="text-sm font-bold text-foreground">{review.name}</p>
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              <MapPin className="h-3 w-3" /> {review.city}
+                            </p>
+                          </div>
+                          <div className="flex gap-0.5">
+                            {Array.from({ length: 5 }).map((_, j) => (
+                              <Star key={j} className={`h-4 w-4 ${j < review.rating ? "text-amber-400 fill-amber-400" : "text-muted-foreground/30"}`} />
+                            ))}
+                          </div>
                         </div>
-                        <div className="flex gap-0.5">
-                          {Array.from({ length: 5 }).map((_, j) => (
-                            <Star
-                              key={j}
-                              className={`h-4 w-4 ${j < review.rating ? "text-amber-400 fill-amber-400" : "text-muted-foreground/30"}`}
-                            />
-                          ))}
-                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">"{review.text}"</p>
                       </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">"{review.text}"</p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            {/* Sidebar - Pricing & CTA */}
             <div>
               <div className="bg-card rounded-2xl border border-border p-6 sticky top-24">
                 <p className="text-sm text-muted-foreground mb-1">Starting at</p>
                 <p className="text-3xl font-bold text-primary mb-1">{pkg.price}</p>
                 <p className="text-xs text-muted-foreground mb-6">Fixed price · No hidden costs</p>
-
                 <Button className="w-full rounded-full mb-3" size="lg" onClick={() => setFormOpen(true)}>
                   Book Free Consultation
                 </Button>
@@ -208,7 +198,6 @@ const PackageDetail = () => {
                     WhatsApp Us <ArrowRight className="h-4 w-4" />
                   </a>
                 </Button>
-
                 <div className="mt-6 pt-6 border-t border-border space-y-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> EMI options available</div>
                   <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Free second opinion</div>
@@ -225,30 +214,33 @@ const PackageDetail = () => {
       {relatedPackages.length > 0 && (
         <section className="py-12 md:py-16 bg-muted/30">
           <div className="container mx-auto px-4">
-            <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8">Other {pkg.specialty} Packages</h2>
+            <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-8">Other {pkg.specialty_name} Packages</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {relatedPackages.map((rp) => (
-                <Link key={rp.slug} to={`/packages/${rp.slug}`} className="group">
-                  <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-lg hover:border-primary/30 transition-all duration-300 h-full flex flex-col">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        <rp.icon className="h-5 w-5 text-primary" />
+              {relatedPackages.map((rp) => {
+                const RpIcon = getIconByName(rp.icon_name);
+                return (
+                  <Link key={rp.slug} to={`/packages/${rp.slug}`} className="group">
+                    <div className="bg-card rounded-2xl border border-border p-6 hover:shadow-lg hover:border-primary/30 transition-all duration-300 h-full flex flex-col">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                          <RpIcon className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-serif font-bold text-foreground group-hover:text-primary transition-colors">{rp.title}</h3>
+                          {rp.tag && <span className="text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{rp.tag}</span>}
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-serif font-bold text-foreground group-hover:text-primary transition-colors">{rp.title}</h3>
-                        {rp.tag && <span className="text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{rp.tag}</span>}
+                      <p className="text-sm text-muted-foreground mb-4 flex-1">{rp.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-bold text-primary">{rp.price}</span>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <MapPin className="h-3 w-3" /> {rp.cities.join(", ")}
+                        </span>
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-4 flex-1">{rp.desc}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-primary">{rp.price}</span>
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <MapPin className="h-3 w-3" /> {rp.cities.join(", ")}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

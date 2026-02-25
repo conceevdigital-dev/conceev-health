@@ -12,6 +12,15 @@ import PackageDetail from "./pages/PackageDetail";
 import DoctorProfile from "./pages/DoctorProfile";
 import Doctors from "./pages/Doctors";
 import NotFound from "./pages/NotFound";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminRoute from "./components/admin/AdminRoute";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminPackages from "./pages/admin/AdminPackages";
+import AdminDoctors from "./pages/admin/AdminDoctors";
+import AdminLocations from "./pages/admin/AdminLocations";
+import AdminSpecialties from "./pages/admin/AdminSpecialties";
+import AdminLeads from "./pages/admin/AdminLeads";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +44,15 @@ const App = () => (
           <Route path="/packages/:slug" element={<PackageDetail />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/doctors/:slug" element={<DoctorProfile />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="packages" element={<AdminPackages />} />
+            <Route path="doctors" element={<AdminDoctors />} />
+            <Route path="locations" element={<AdminLocations />} />
+            <Route path="specialties" element={<AdminSpecialties />} />
+            <Route path="leads" element={<AdminLeads />} />
+          </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
