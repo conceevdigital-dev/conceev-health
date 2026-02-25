@@ -14,32 +14,34 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const loginViaEdgeFunction = async (): Promise<{ access_token: string; refresh_token: string } | null> => {
-    try {
+  const loginViaEdgeFunction = (): Promise<{ access_token: string; refresh_token: string }> => {
+    return new Promise((resolve, reject) => {
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
       const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       const url = `https://${projectId}.supabase.co/functions/v1/admin-login`;
 
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": anonKey,
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", url, true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("apikey", anonKey);
 
-      const data = await res.json();
+      xhr.onload = () => {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(data);
+          } else {
+            reject(new Error(data.error || "Login failed"));
+          }
+        } catch {
+          reject(new Error("Invalid response from server"));
+        }
+      };
 
-      if (!res.ok) {
-        throw new Error(data.error || "Login failed");
-      }
+      xhr.onerror = () => reject(new Error("Network error"));
 
-      return data;
-    } catch (err: any) {
-      console.error("Edge function login failed:", err);
-      throw err;
-    }
+      xhr.send(JSON.stringify({ email, password }));
+    });
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -47,44 +49,17 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      // Try direct auth first
-      let session: any = null;
-      let directError: any = null;
-
-      try {
-        const result = await supabase.auth.signInWithPassword({ email, password });
-        if (result.error) {
-          directError = result.error;
-        } else {
-          session = result.data.session;
-        }
-      } catch (err: any) {
-        directError = err;
-      }
-
-      // If direct auth failed with network error, fallback to edge function
-      if (directError) {
-        const msg = directError.message || String(directError);
-        if (msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("fetch")) {
-          console.log("Direct auth failed with network error, trying backend function...");
-          const tokens = await loginViaEdgeFunction();
-          if (tokens) {
-            const { error: setErr } = await supabase.auth.setSession({
-              access_token: tokens.access_token,
-              refresh_token: tokens.refresh_token,
-            });
-            if (setErr) {
-              toast({ title: "Login failed", description: setErr.message, variant: "destructive" });
-              setLoading(false);
-              return;
-            }
-          }
-        } else {
-          // Non-network error (wrong password, etc.)
-          toast({ title: "Login failed", description: msg, variant: "destructive" });
-          setLoading(false);
-          return;
-        }
+      // Always use XHR-based edge function to bypass fetch interceptor
+      console.log("Logging in via backend function (XHR)...");
+      const tokens = await loginViaEdgeFunction();
+      const { error: setErr } = await supabase.auth.setSession({
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+      });
+      if (setErr) {
+        toast({ title: "Login failed", description: setErr.message, variant: "destructive" });
+        setLoading(false);
+        return;
       }
 
       // Check admin role
