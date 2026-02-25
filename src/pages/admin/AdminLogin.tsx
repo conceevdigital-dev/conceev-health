@@ -14,21 +14,31 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const attemptLogin = async (retries = 3): Promise<{ error: any }> => {
-    for (let i = 0; i < retries; i++) {
+  const attemptLogin = async (maxRetries = 3): Promise<{ data: any; error: any }> => {
+    for (let i = 0; i < maxRetries; i++) {
       try {
         const result = await supabase.auth.signInWithPassword({ email, password });
+        // Check if the returned error is a network/fetch error (retryable)
+        if (result.error) {
+          const msg = result.error.message || "";
+          if (msg.includes("Failed to fetch") && i < maxRetries - 1) {
+            console.log(`Login attempt ${i + 1} failed with network error, retrying...`);
+            await new Promise((r) => setTimeout(r, 1500 * (i + 1)));
+            continue;
+          }
+        }
         return result;
       } catch (err: any) {
         const msg = err?.message || String(err);
-        if (msg.includes("Failed to fetch") && i < retries - 1) {
-          await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
+        if (msg.includes("Failed to fetch") && i < maxRetries - 1) {
+          console.log(`Login attempt ${i + 1} threw network error, retrying...`);
+          await new Promise((r) => setTimeout(r, 1500 * (i + 1)));
           continue;
         }
-        return { error: { message: msg } };
+        return { data: null, error: { message: msg } };
       }
     }
-    return { error: { message: "Login failed after multiple attempts. Please try again." } };
+    return { data: null, error: { message: "Login failed after multiple attempts. Please check your network and try again." } };
   };
 
   const handleLogin = async (e: React.FormEvent) => {
