@@ -7,6 +7,13 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Lock } from "lucide-react";
 
+// Hardcoded fallbacks so login works even if env vars are missing in production build
+const FALLBACK_URL = "https://dlwiktowlhbrlcjeojcc.supabase.co";
+const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsd2lrdG93bGhicmxjamVvamNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1ODE1ODMsImV4cCI6MjA4NzE1NzU4M30.LxNDV4FrhS_kRlQodQ5kUnvVW-5Ux3l0DZSWRj9_YSY";
+
+const getSupabaseUrl = () => import.meta.env.VITE_SUPABASE_URL || FALLBACK_URL;
+const getAnonKey = () => import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_KEY;
+
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,32 +21,38 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const loginViaEdgeFunction = (): Promise<{ access_token: string; refresh_token: string }> => {
-    return new Promise((resolve, reject) => {
-      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-login`;
+  const loginViaFetch = async (): Promise<{ access_token: string; refresh_token: string }> => {
+    const url = `${getSupabaseUrl()}/functions/v1/admin-login`;
+    console.log("Fetch: calling", url);
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": getAnonKey(),
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    return data;
+  };
 
-      console.log("XHR fallback: calling", url);
+  const loginViaXHR = (): Promise<{ access_token: string; refresh_token: string }> => {
+    return new Promise((resolve, reject) => {
+      const url = `${getSupabaseUrl()}/functions/v1/admin-login`;
+      console.log("XHR: calling", url);
       const xhr = new XMLHttpRequest();
       xhr.open("POST", url, true);
       xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.setRequestHeader("apikey", anonKey);
-
+      xhr.setRequestHeader("apikey", getAnonKey());
       xhr.onload = () => {
         try {
           const data = JSON.parse(xhr.responseText);
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve(data);
-          } else {
-            reject(new Error(data.error || "Login failed"));
-          }
-        } catch {
-          reject(new Error("Invalid response from server"));
-        }
+          if (xhr.status >= 200 && xhr.status < 300) resolve(data);
+          else reject(new Error(data.error || `XHR ${xhr.status}`));
+        } catch { reject(new Error("Invalid response")); }
       };
-
-      xhr.onerror = () => reject(new Error("Network error"));
-
+      xhr.onerror = () => reject(new Error("XHR network error"));
       xhr.send(JSON.stringify({ email, password }));
     });
   };
@@ -48,31 +61,62 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
 
-    try {
-      let session;
+    const errors: string[] = [];
 
-      // Try direct signInWithPassword first (works on published site)
+    try {
+      let tokens: { access_token: string; refresh_token: string } | null = null;
+
+      // Strategy 1: fetch to edge function
       try {
-        console.log("Attempting direct sign in...");
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        session = data.session;
-        console.log("Direct sign in succeeded");
-      } catch (directErr: any) {
-        console.log("Direct sign in failed:", directErr.message, "- trying edge function fallback...");
-        // Fallback to XHR edge function (for preview iframe where fetch is intercepted)
-        const tokens = await loginViaEdgeFunction();
+        tokens = await loginViaFetch();
+        console.log("Fetch login succeeded");
+      } catch (err: any) {
+        console.warn("Fetch failed:", err.message);
+        errors.push(`fetch: ${err.message}`);
+      }
+
+      // Strategy 2: XHR to edge function
+      if (!tokens) {
+        try {
+          tokens = await loginViaXHR();
+          console.log("XHR login succeeded");
+        } catch (err: any) {
+          console.warn("XHR failed:", err.message);
+          errors.push(`xhr: ${err.message}`);
+        }
+      }
+
+      // If we got tokens, set session
+      let session;
+      if (tokens) {
         const { error: setErr } = await supabase.auth.setSession({
           access_token: tokens.access_token,
           refresh_token: tokens.refresh_token,
         });
         if (setErr) throw setErr;
         session = (await supabase.auth.getSession()).data.session;
-        console.log("Edge function fallback succeeded");
+      }
+
+      // Strategy 3: direct signInWithPassword
+      if (!session) {
+        try {
+          console.log("Attempting direct sign in...");
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          session = data.session;
+          console.log("Direct sign in succeeded");
+        } catch (err: any) {
+          console.warn("Direct sign in failed:", err.message);
+          errors.push(`direct: ${err.message}`);
+        }
       }
 
       if (!session?.user) {
-        toast({ title: "Login failed", description: "Could not establish session", variant: "destructive" });
+        toast({
+          title: "Login failed",
+          description: `All methods failed. ${errors.join(" | ")}. URL: ${getSupabaseUrl()}`,
+          variant: "destructive",
+        });
         setLoading(false);
         return;
       }
@@ -95,7 +139,7 @@ const AdminLogin = () => {
       navigate("/admin");
     } catch (err: any) {
       console.error("Login error:", err);
-      toast({ title: "Login failed", description: err.message || "An unexpected error occurred", variant: "destructive" });
+      toast({ title: "Login failed", description: `${err.message} | URL: ${getSupabaseUrl()}`, variant: "destructive" });
       setLoading(false);
     }
   };
