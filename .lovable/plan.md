@@ -1,95 +1,67 @@
 
 
-## Problem Analysis
+## Root Cause Analysis
 
-**Backend is confirmed working**: Direct call to the `admin-login` edge function with `admin2@conceev.health` / `Cv$3cUr3!Adm1n` returns a valid `access_token` and `refresh_token` (HTTP 200). The user exists and has the `admin` role in `user_roles`.
+After thorough investigation, here are the findings:
 
-**The client-side issue**: The current `AdminLogin.tsx` ONLY uses `XMLHttpRequest` to call the edge function. It never tries the standard `supabase.auth.signInWithPassword()`. On the published site (`conceevhealth.com`), `window.fetch` is NOT intercepted (the `lovable.js` interceptor only exists in the preview iframe), so `signInWithPassword()` should work perfectly.
+**What works:**
+- Backend is fully operational (direct API calls to the edge function return valid tokens)
+- Login works perfectly in the dev sandbox (lovableproject.com)
+- Credentials are correct (admin2@conceev.health / Cv$3cUr3!Adm1n)
+- Edge function CORS headers are present (`Access-Control-Allow-Origin: *`)
+- RLS policies and user_roles table are correctly configured
 
-The XHR-only approach is fragile -- "Network error" on XHR can be caused by CORS preflight issues, missing headers, or browser restrictions that don't affect `fetch`. The XHR workaround was only needed for the preview iframe, not the published site.
+**What fails:**
+- Login on the published site (conceev-health.lovable.app) shows "Network error"
+- Login on custom domain (conceevhealth.com) shows "Network error"
+- The console confirms the latest code IS deployed ("Attempting direct sign in..." is logged)
 
-## Solution
+**Root cause:**
+The published production build likely has missing or broken environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`). In the dev sandbox, Vite resolves these from the `.env` file at runtime. In the production build, they must be statically replaced at build time. If the Lovable build process doesn't inject these correctly into the production bundle, both the Supabase client initialization and the XHR fallback URL would be `undefined`, causing all API requests to fail with "Network error".
 
-Rewrite `handleLogin` in `src/pages/admin/AdminLogin.tsx` to:
+Evidence: ALL Supabase requests fail on the published site - not just auth, but also data queries (specialties, packages, cities, locations all show "Failed to fetch").
 
-1. **Primary**: Use `supabase.auth.signInWithPassword()` directly -- this works on the published site and custom domain
-2. **Fallback**: If that fails with a network error, fall back to the XHR edge function approach (for the preview iframe)
-3. Use `VITE_SUPABASE_URL` (guaranteed to exist) instead of constructing the URL from `VITE_SUPABASE_PROJECT_ID`
-4. Add console logging at each step for debugging
+---
 
-### File: `src/pages/admin/AdminLogin.tsx`
+## Fix Plan
 
-Replace `handleLogin` logic:
+Make the admin login completely independent of environment variables by constructing the Supabase URL and key from the known project ID, which IS correctly embedded (since `VITE_SUPABASE_PROJECT_ID` is used elsewhere and the page loads).
 
-```typescript
-const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
+### Changes
 
-  try {
-    let session;
+**1. Update `AdminLogin.tsx` - Bulletproof login with hardcoded fallback values**
 
-    // Try direct signInWithPassword first (works on published site)
-    try {
-      console.log("Attempting direct sign in...");
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      session = data.session;
-      console.log("Direct sign in succeeded");
-    } catch (directErr: any) {
-      console.log("Direct sign in failed:", directErr.message, "- trying edge function fallback...");
-      // Fallback to XHR edge function (for preview iframe where fetch is intercepted)
-      const tokens = await loginViaEdgeFunction();
-      const { error: setErr } = await supabase.auth.setSession({
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-      });
-      if (setErr) throw setErr;
-      session = (await supabase.auth.getSession()).data.session;
-      console.log("Edge function fallback succeeded");
-    }
+- Extract the Supabase URL and anon key with fallback constants derived from the project configuration
+- Use `fetch()` as the primary auth method (more reliable than both supabase client and XHR)
+- Keep XHR as secondary fallback
+- Add detailed error logging showing exactly what URL is being called and what error occurs
+- Show the actual error details in the toast message for debugging
 
-    if (!session?.user) {
-      toast({ title: "Login failed", description: "Could not establish session", variant: "destructive" });
-      setLoading(false);
-      return;
-    }
+**2. Update `admin-login` edge function - Add `Access-Control-Allow-Methods`**
 
-    // Check admin role
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", session.user.id)
-      .eq("role", "admin")
-      .maybeSingle();
+- Add `Access-Control-Allow-Methods: POST, OPTIONS` to the CORS headers (currently missing, which can cause CORS preflight failures in some browsers)
 
-    if (!roleData) {
-      await supabase.auth.signOut();
-      toast({ title: "Access denied", description: "You don't have admin privileges.", variant: "destructive" });
-      setLoading(false);
-      return;
-    }
+### Technical Details
 
-    navigate("/admin");
-  } catch (err: any) {
-    console.error("Login error:", err);
-    toast({ title: "Login failed", description: err.message || "An unexpected error occurred", variant: "destructive" });
-    setLoading(false);
-  }
-};
+The login flow will be:
+
+```text
+1. Try fetch() to edge function /admin-login
+   ├─ Success → setSession with tokens → check admin role → redirect
+   └─ Fail →
+2. Try XHR to edge function /admin-login  
+   ├─ Success → setSession with tokens → check admin role → redirect
+   └─ Fail →
+3. Try supabase.auth.signInWithPassword (direct)
+   ├─ Success → check admin role → redirect
+   └─ Fail → Show detailed error with URL + status info
 ```
 
-Also update `loginViaEdgeFunction` to use `VITE_SUPABASE_URL` instead of constructing from project ID:
-
-```typescript
-const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-login`;
+The URL for the edge function will be constructed as:
+```text
+const url = SUPABASE_URL + "/functions/v1/admin-login"
 ```
+Where `SUPABASE_URL` uses `import.meta.env.VITE_SUPABASE_URL` with a hardcoded fallback value if the env var is undefined.
 
-### Summary of changes
-
-- **One file**: `src/pages/admin/AdminLogin.tsx`
-- **Primary approach**: `signInWithPassword()` (works on published/custom domain sites)
-- **Fallback**: XHR edge function (works in preview iframe where fetch is blocked)
-- **URL fix**: Use `VITE_SUPABASE_URL` for reliability
-- **Better logging**: Console logs at each step for debugging
+This ensures login works regardless of whether environment variables are properly embedded in the production build.
 
