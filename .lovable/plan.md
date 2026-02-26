@@ -1,67 +1,28 @@
 
 
-## Root Cause Analysis
+## Root Cause Found
 
-After thorough investigation, here are the findings:
+The problem is clear: **the imported `supabase` client** (from `@/integrations/supabase/client.ts`) is used for `setSession()`, `signInWithPassword()`, and the admin role check (lines 92, 104, 125). This auto-generated client uses `import.meta.env` variables with **no fallbacks**. If the production build doesn't properly embed these env vars, the client is initialized with `undefined` URL/key, causing every call through it to fail with "Failed to fetch" / "Network error".
 
-**What works:**
-- Backend is fully operational (direct API calls to the edge function return valid tokens)
-- Login works perfectly in the dev sandbox (lovableproject.com)
-- Credentials are correct (admin2@conceev.health / Cv$3cUr3!Adm1n)
-- Edge function CORS headers are present (`Access-Control-Allow-Origin: *`)
-- RLS policies and user_roles table are correctly configured
+Meanwhile, the `loginViaFetch` and `loginViaXHR` functions correctly use hardcoded fallbacks — but even when they succeed and return tokens, the broken `supabase` client fails on `setSession()` (line 92), which throws an error.
 
-**What fails:**
-- Login on the published site (conceev-health.lovable.app) shows "Network error"
-- Login on custom domain (conceevhealth.com) shows "Network error"
-- The console confirms the latest code IS deployed ("Attempting direct sign in..." is logged)
+### Fix Plan
 
-**Root cause:**
-The published production build likely has missing or broken environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`). In the dev sandbox, Vite resolves these from the `.env` file at runtime. In the production build, they must be statically replaced at build time. If the Lovable build process doesn't inject these correctly into the production bundle, both the Supabase client initialization and the XHR fallback URL would be `undefined`, causing all API requests to fail with "Network error".
+**1. Simplify `AdminLogin.tsx` — create a local Supabase client with hardcoded fallbacks**
 
-Evidence: ALL Supabase requests fail on the published site - not just auth, but also data queries (specialties, packages, cities, locations all show "Failed to fetch").
+Remove the complex triple-strategy. Instead:
+- Create a local `createClient()` instance using the hardcoded Supabase URL and anon key (with env var override if available)
+- Use this local client for `signInWithPassword()` directly — no edge function needed
+- Use this same local client for the `user_roles` admin check
+- After successful login, also set the session on the main `supabase` client so the rest of the app works
 
----
+This eliminates the dependency on the auto-generated client for the login flow entirely.
 
-## Fix Plan
+**2. Add `manage-users` to `supabase/config.toml`**
 
-Make the admin login completely independent of environment variables by constructing the Supabase URL and key from the known project ID, which IS correctly embedded (since `VITE_SUPABASE_PROJECT_ID` is used elsewhere and the page loads).
+The `manage-users` edge function is missing from `config.toml`, meaning it defaults to `verify_jwt = true` (broken with signing-keys). Add it with `verify_jwt = false` so the Users admin page works.
 
-### Changes
+**3. Update `AdminUsers.tsx` — use proper Supabase URL construction**
 
-**1. Update `AdminLogin.tsx` - Bulletproof login with hardcoded fallback values**
-
-- Extract the Supabase URL and anon key with fallback constants derived from the project configuration
-- Use `fetch()` as the primary auth method (more reliable than both supabase client and XHR)
-- Keep XHR as secondary fallback
-- Add detailed error logging showing exactly what URL is being called and what error occurs
-- Show the actual error details in the toast message for debugging
-
-**2. Update `admin-login` edge function - Add `Access-Control-Allow-Methods`**
-
-- Add `Access-Control-Allow-Methods: POST, OPTIONS` to the CORS headers (currently missing, which can cause CORS preflight failures in some browsers)
-
-### Technical Details
-
-The login flow will be:
-
-```text
-1. Try fetch() to edge function /admin-login
-   ├─ Success → setSession with tokens → check admin role → redirect
-   └─ Fail →
-2. Try XHR to edge function /admin-login  
-   ├─ Success → setSession with tokens → check admin role → redirect
-   └─ Fail →
-3. Try supabase.auth.signInWithPassword (direct)
-   ├─ Success → check admin role → redirect
-   └─ Fail → Show detailed error with URL + status info
-```
-
-The URL for the edge function will be constructed as:
-```text
-const url = SUPABASE_URL + "/functions/v1/admin-login"
-```
-Where `SUPABASE_URL` uses `import.meta.env.VITE_SUPABASE_URL` with a hardcoded fallback value if the env var is undefined.
-
-This ensures login works regardless of whether environment variables are properly embedded in the production build.
+Currently uses `VITE_SUPABASE_PROJECT_ID` to construct the URL, which may also be missing. Use the same hardcoded fallback pattern.
 
