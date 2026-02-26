@@ -10,6 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Shield, ShieldOff, KeyRound, Users } from "lucide-react";
 
+const FALLBACK_URL = "https://dlwiktowlhbrlcjeojcc.supabase.co";
+const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsd2lrdG93bGhicmxjamVvamNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1ODE1ODMsImV4cCI6MjA4NzE1NzU4M30.LxNDV4FrhS_kRlQodQ5kUnvVW-5Ux3l0DZSWRj9_YSY";
+
+const getUrl = () => import.meta.env.VITE_SUPABASE_URL || FALLBACK_URL;
+const getKey = () => import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_KEY;
+
 interface UserInfo {
   id: string;
   email: string;
@@ -22,28 +28,21 @@ interface UserInfo {
 const callManageUsers = async (body: Record<string, any>) => {
   const session = await supabase.auth.getSession();
   const token = session.data.session?.access_token;
-  const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-  const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  const url = `https://${projectId}.supabase.co/functions/v1/manage-users`;
+  const url = `${getUrl()}/functions/v1/manage-users`;
 
-  return new Promise<any>((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("apikey", anonKey);
-    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-    xhr.onload = () => {
-      try {
-        const data = JSON.parse(xhr.responseText);
-        if (xhr.status >= 200 && xhr.status < 300) resolve(data);
-        else reject(new Error(data.error || "Request failed"));
-      } catch {
-        reject(new Error("Invalid response"));
-      }
-    };
-    xhr.onerror = () => reject(new Error("Network error"));
-    xhr.send(JSON.stringify(body));
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": getKey(),
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
   });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Request failed");
+  return data;
 };
 
 const AdminUsers = () => {
